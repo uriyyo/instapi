@@ -143,6 +143,18 @@ class User(Entity):
     def liked_by_user(self, user: 'User') -> List['Feed']:
         return [f for f in self.iter_feeds() if f.liked_by(user)]
 
+    def iter_stories(self) -> Iterable['Resource']:
+        for result in (client.user_story_feed(self.pk)['reel'] or {}).get('items', ()):
+            # FIXME: same logic as in Feed.iter_resources
+            if 'video_versions' in result:
+                yield Resource.__from_dict__(result['video_versions'][0])
+            else:
+                yield Resource.__from_dict__(result['image_versions2']['candidates'][0])
+
+    @fetcher(iter_stories)
+    def stories(self, limit: Optional[int] = None) -> Iterable['Resource']:
+        ...
+
 
 __all__ = [
     'User',
