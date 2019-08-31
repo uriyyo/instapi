@@ -88,7 +88,7 @@ class Feed(Media):
         return to_list(self.iter_videos(), limit=limit)
 
     def iter_images(self) -> Iterable['Image']:
-        return self.iter_resources(video=False, image=False)
+        return self.iter_resources(video=False, image=True)
 
     def images(self, limit: Optional[int] = None) -> List['Image']:
         return to_list(self.iter_images(), limit=limit)

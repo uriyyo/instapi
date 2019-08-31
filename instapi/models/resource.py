@@ -5,7 +5,7 @@ from typing import Union
 from urllib.parse import urlparse
 
 from dataclasses import dataclass
-from PIL import Image
+from PIL import Image as PILImage
 from requests import get
 
 from instapi.models.base import BaseModel
@@ -40,7 +40,7 @@ class Image(Resource):
     def preview(self):
         response = get(self.url)
         image = io.BytesIO(response.content)
-        img = Image.open(image)
+        img = PILImage.open(image)
         img.show()
 
 
