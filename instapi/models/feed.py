@@ -47,8 +47,8 @@ class Feed(Media):
 
     def liked_by(self, user: 'User') -> bool:
         return any(
-            user.pk in result['users'] for result
-            in process_many(client.media_likers, self.pk)
+            any(user.pk == u['pk'] for u in result['users'])
+            for result in process_many(client.media_likers, self.pk)
         )
 
     def like(self) -> None:
