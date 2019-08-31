@@ -47,6 +47,15 @@ class User(Entity):
         return cls.create(client.username_info(username)['user'])
 
     @classmethod
+    def match_username(cls, username: str, limit: Optional[int] = None) -> List['User']:
+        response = client.search_users(
+            query=username,
+            **({'count': limit} if limit is not None else {}),
+        )
+
+        return [cls.create(user) for user in response['users']]
+
+    @classmethod
     def self(cls) -> 'User':
         return cls.get(client.current_user()['user']['pk'])
 
@@ -110,7 +119,7 @@ class User(Entity):
             yield from map(User.create, result['users'])
 
     def followers(self, limit: Optional[int] = None) -> List['User']:
-        return to_list(self.iter_followings(), limit=limit)
+        return to_list(self.iter_followers(), limit=limit)
 
     def iter_followings(self) -> Iterable['User']:
         for result in process_many(client.user_following, self.pk, with_rank_token=True):
