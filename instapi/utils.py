@@ -39,7 +39,7 @@ def limited(iterable: Iterable[T], limit: Optional[int] = None) -> Iterable[T]:
     if limit is None:
         yield from iterable
     else:
-        yield from (i for i, _ in zip(iterable, range(limit)))
+        yield from (i for i, _ in zip(range(limit), iterable))
 
 
 def to_list(iterable: Iterable[T], limit: Optional[int] = None) -> List[T]:
