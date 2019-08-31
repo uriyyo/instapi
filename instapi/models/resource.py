@@ -1,6 +1,7 @@
 import io
 from pathlib import Path
 from shutil import copyfileobj
+from typing import Union
 from urllib.parse import urlparse
 
 from dataclasses import dataclass
@@ -28,6 +29,14 @@ class Resource(BaseModel):
         with into.open(mode='wb') as f:
             copyfileobj(response.raw, f)
 
+
+@dataclass(frozen=True)
+class Video(Resource):
+    ...
+
+
+@dataclass(frozen=True)
+class Image(Resource):
     def preview(self):
         response = get(self.url)
         image = io.BytesIO(response.content)
@@ -35,6 +44,11 @@ class Resource(BaseModel):
         img.show()
 
 
+Resources = Union[Image, Video]
+
 __all__ = [
     'Resource',
+    'Resources',
+    'Video',
+    'Image',
 ]

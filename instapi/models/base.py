@@ -20,12 +20,13 @@ class BaseModel:
 
     @classmethod
     @lru_cache()
-    def __field_names__(cls) -> Set[str]:
+    def fields(cls) -> Set[str]:
         return cls.__dataclass_fields__.keys() - {'__dataclass_fields__'}
 
     @classmethod
-    def __from_dict__(cls, data: Dict[str, Any]):
-        return cls(**{k: data[k] for k in cls.__field_names__()})
+    def create(cls, data: Dict[str, Any]):
+        # noinspection PyArgumentList
+        return cls(**{k: data[k] for k in cls.fields()})
 
 
 @dataclass(frozen=True)

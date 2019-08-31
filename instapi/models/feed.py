@@ -1,4 +1,3 @@
-from functools import partial
 from typing import (
     Iterable,
     List,
@@ -10,11 +9,15 @@ from dataclasses import dataclass
 from instapi.client import client
 from instapi.models.base import Media
 from instapi.models.comment import Comment
-from instapi.models.resource import Resource
+from instapi.models.resource import (
+    Image,
+    Resources,
+    Video,
+)
 from instapi.models.user import User
 from instapi.utils import (
-    fetcher,
     process_many,
+    to_list,
 )
 
 
@@ -27,22 +30,20 @@ class Feed(Media):
     def iter_timeline(cls) -> Iterable['Feed']:
         for result in process_many(client.feed_timeline):
             yield from (
-                Feed.__from_dict__(data['media_or_ad']) for data in result['feed_items']
+                Feed.create(data['media_or_ad']) for data in result['feed_items']
                 if 'media_or_ad' in data
             )
 
     @classmethod
-    @fetcher(iter_timeline)
     def timeline(cls, limit: Optional[int] = None) -> List['Feed']:
-        ...
+        return to_list(cls.iter_timeline(), limit=limit)
 
     def iter_likes(self) -> Iterable['User']:
         for result in process_many(client.media_likers, self.pk):
-            yield from map(User.__from_dict__, result['users'])
+            yield from map(User.create, result['users'])
 
-    @fetcher(iter_likes)
     def likes(self, limit: Optional[int] = None) -> List['User']:
-        ...
+        return to_list(self.iter_likes(), limit=limit)
 
     def liked_by(self, user: 'User') -> bool:
         return any(
@@ -59,47 +60,44 @@ class Feed(Media):
     def iter_comments(self) -> Iterable['Comment']:
         for result in process_many(client.media_comments, self.pk):
             for c in result['comments']:
-                c['user'] = User.__from_dict__(c['user'])
+                c['user'] = User.create(c['user'])
 
-            yield from map(Comment.__from_dict__, result['comments'])
+            yield from map(Comment.create, result['comments'])
 
-    @fetcher(iter_comments)
     def comments(self, limit: Optional[int] = None) -> List['Comment']:
-        ...
+        return to_list(self.iter_comments(), limit=limit)
 
-    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable['Resource']:
+    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable[Resources]:
+        # TODO: implement ability to fetch media with different quality
         media_info = self._media_info()
         carousel_media = media_info.get('carousel_media', [media_info])
 
         for media in carousel_media:
             if 'video_versions' in media and video:
-                yield Resource.__from_dict__(media['video_versions'][0])
+                yield Video.create(media['video_versions'][0])
             elif 'video_versions' not in media and image:
-                yield Resource.__from_dict__(media['image_versions2']['candidates'][0])
+                yield Image.create(media['image_versions2']['candidates'][0])
 
-    @fetcher(iter_resources)
-    def resources(self, limit: Optional[int] = None) -> List['Resource']:
-        ...
+    def resources(self, video: bool = True, image: bool = True, limit: Optional[int] = None) -> List[Resources]:
+        return to_list(self.iter_resources(video=video, image=image), limit=limit)
 
-    @fetcher(partial(iter_resources, video=True, image=False))
-    def videos(self, limit: Optional[int] = None) -> List['Resource']:
-        ...
+    def iter_videos(self) -> Iterable['Video']:
+        return self.iter_resources(video=True, image=False)
 
-    @fetcher(partial(iter_resources, video=False, image=True))
-    def images(self, limit: Optional[int] = None) -> List['Resource']:
-        ...
+    def videos(self, limit: Optional[int] = None) -> List['Video']:
+        return to_list(self.iter_videos(), limit=limit)
 
-    def image(self) -> Optional['Resource']:
-        try:
-            return self.images()[0]
-        except IndexError:
-            return None
+    def iter_images(self) -> Iterable['Image']:
+        return self.iter_resources(video=False, image=False)
 
-    def video(self) -> Optional['Resource']:
-        try:
-            return self.videos()[0]
-        except IndexError:
-            return None
+    def images(self, limit: Optional[int] = None) -> List['Image']:
+        return to_list(self.iter_images(), limit=limit)
+
+    def image(self) -> Optional['Image']:
+        return next(iter(self.iter_images()), None)
+
+    def video(self) -> Optional['Video']:
+        return next(iter(self.iter_videos()), None)
 
 
 __all__ = [

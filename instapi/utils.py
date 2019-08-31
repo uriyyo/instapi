@@ -1,11 +1,9 @@
-from functools import wraps
 from typing import (
     Callable,
     Iterable,
     List,
     Optional,
     TypeVar,
-    Union,
 )
 from uuid import uuid1
 
@@ -44,22 +42,12 @@ def limited(iterable: Iterable[T], limit: Optional[int] = None) -> Iterable[T]:
         yield from (i for i, _ in zip(iterable, range(limit)))
 
 
-def fetcher(iter_func: Union[Callable[..., Iterable[T]], classmethod]):
-    if isinstance(iter_func, classmethod):
-        iter_func: Iterable[T] = iter_func.__func__
-
-    def decorator(func):
-        @wraps(func)
-        def wrapper(self, limit: Optional[T] = None) -> List[T]:
-            return [*limited(iter_func(self), limit)]
-
-        return wrapper
-
-    return decorator
+def to_list(iterable: Iterable[T], limit: Optional[int] = None) -> List[T]:
+    return [*limited(iterable, limit=limit)]
 
 
 __all__ = [
     'process_many',
     'limited',
-    'fetcher',
+    'to_list',
 ]

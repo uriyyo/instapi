@@ -16,10 +16,15 @@ from dataclasses import (
 
 from instapi.client import client
 from instapi.models.base import Entity
-from instapi.models.resource import Resource
+from instapi.models.resource import (
+    Image,
+    Resource,
+    Resources,
+    Video,
+)
 from instapi.utils import (
-    fetcher,
     process_many,
+    to_list,
 )
 
 if TYPE_CHECKING:
@@ -35,11 +40,11 @@ class User(Entity):
 
     @classmethod
     def get(cls, pk: int) -> 'User':
-        return cls.__from_dict__(client.user_info(pk)['user'])
+        return cls.create(client.user_info(pk)['user'])
 
     @classmethod
     def from_username(cls, username: str) -> 'User':
-        return cls.__from_dict__(client.username_info(username)['user'])
+        return cls.create(client.username_info(username)['user'])
 
     @classmethod
     def self(cls) -> 'User':
@@ -83,50 +88,44 @@ class User(Entity):
         for feed in self.iter_feeds():
             yield from feed.images()
 
-    @fetcher(iter_images)
     def images(self, limit: Optional[int] = None) -> List['Resource']:
-        ...
+        return to_list(self.iter_images(), limit=limit)
 
     def iter_videos(self) -> Iterable['Resource']:
         for feed in self.feeds():
             yield from feed.videos()
 
-    @fetcher(iter_videos)
     def videos(self, limit: Optional[int] = None) -> List['Resource']:
-        ...
+        return to_list(self.iter_videos(), limit=limit)
 
     def iter_resources(self) -> Iterable['Resource']:
         for feed in self.iter_feeds():
             yield from feed.iter_resources()
 
-    @fetcher(iter_resources)
     def resources(self, limit: Optional[int] = None) -> List['Resource']:
-        ...
+        return to_list(self.iter_resources(), limit=limit)
 
     def iter_followers(self) -> Iterable['User']:
         for result in process_many(client.user_followers, self.pk, with_rank_token=True):
-            yield from map(User.__from_dict__, result['users'])
+            yield from map(User.create, result['users'])
 
-    @fetcher(iter_followers)
     def followers(self, limit: Optional[int] = None) -> List['User']:
-        ...
+        return to_list(self.iter_followings(), limit=limit)
 
     def iter_followings(self) -> Iterable['User']:
         for result in process_many(client.user_following, self.pk, with_rank_token=True):
-            yield from map(User.__from_dict__, result['users'])
+            yield from map(User.create, result['users'])
 
-    @fetcher(iter_followings)
-    def followings(self, ) -> List['User']:
-        ...
+    def followings(self, limit: Optional[int] = None) -> List['User']:
+        return to_list(self.iter_followings(), limit=limit)
 
     def iter_feeds(self) -> Iterable['Feed']:
         from instapi.models.feed import Feed
         for result in process_many(client.user_feed, self.pk):
-            yield from map(Feed.__from_dict__, result['items'])
+            yield from map(Feed.create, result['items'])
 
-    @fetcher(iter_feeds)
     def feeds(self, limit: Optional[int] = None) -> List['Feed']:
-        ...
+        return to_list(self.iter_feeds(), limit=limit)
 
     def total_comments(self) -> int:
         return sum(feed.comment_count for feed in self.iter_feeds())
@@ -140,20 +139,21 @@ class User(Entity):
     def likes_statistic(self) -> Counter['User']:
         return RealCounter(self.likes_chain())
 
-    def liked_by_user(self, user: 'User') -> List['Feed']:
-        return [f for f in self.iter_feeds() if f.liked_by(user)]
+    def iter_liked_by_user(self, user: 'User') -> Iterable['Feed']:
+        return (f for f in self.iter_feeds() if f.liked_by(user))
 
-    def iter_stories(self) -> Iterable['Resource']:
+    def liked_by_user(self, user: 'User', limit: Optional[int] = None) -> List['Feed']:
+        return to_list(self.iter_liked_by_user(user), limit=limit)
+
+    def iter_stories(self) -> Iterable['Resources']:
         for result in (client.user_story_feed(self.pk)['reel'] or {}).get('items', ()):
-            # FIXME: same logic as in Feed.iter_resources
             if 'video_versions' in result:
-                yield Resource.__from_dict__(result['video_versions'][0])
+                yield Video.create(result['video_versions'][0])
             else:
-                yield Resource.__from_dict__(result['image_versions2']['candidates'][0])
+                yield Image.create(result['image_versions2']['candidates'][0])
 
-    @fetcher(iter_stories)
-    def stories(self, limit: Optional[int] = None) -> Iterable['Resource']:
-        ...
+    def stories(self, limit: Optional[int] = None) -> List['Resources']:
+        return to_list(self.iter_stories(), limit=limit)
 
 
 __all__ = [
