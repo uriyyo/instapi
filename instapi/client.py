@@ -1,5 +1,8 @@
 import ssl
-from typing import cast
+from typing import (
+    cast,
+    ClassVar,
+)
 
 from dataclasses import dataclass
 from instagram_private_api import Client as BaseClient
@@ -13,8 +16,14 @@ ssl._create_default_https_context = ssl._create_unverified_context
 class ClientProxy:
     obj: BaseClient = None
 
+    # Used to return dummy implementation of methods
+    is_testing: ClassVar[bool] = False
+
     def __getattr__(self, item):
         if self.obj is None:
+            if self.is_testing:
+                return None
+
             raise ClientNotInitedException()
 
         return getattr(self.obj, item)
@@ -30,4 +39,5 @@ def bind(username: str, password: str) -> None:
 __all__ = [
     'bind',
     'client',
+    'ClientProxy',
 ]
