@@ -1,41 +1,147 @@
+from itertools import chain
 from random import (
     choice,
     randint,
 )
-from string import printable
+from string import (
+    ascii_letters,
+    printable,
+)
+from typing import (
+    List,
+    Iterable,
+    TypeVar,
+)
 
 from pytest import fixture
 
 from instapi.models import (
     Comment,
+    Feed,
     User,
 )
+from instapi.models.resource import (
+    Image,
+    Video,
+)
+
+T = TypeVar('T')
 
 
-def random_string(length: int = 10) -> str:
+def flat(source: List[Iterable[T]]) -> List[T]:
     """
-    Generate random string from printable characters
+    Unpack list of iterable into single list
+
+    :param source: list of iterable
+    :return: unpacked list
+    """
+    return [*chain.from_iterable(i for i in source)]
+
+
+def random_string(length: int = 10, source: str = printable) -> str:
+    """
+    Generate random string from source string
 
     :param length: length of generated string
+    :param source: source of characters to use
     :return: random string
     """
-    return ''.join(choice(printable) for _ in range(length))
+    return ''.join(choice(source) for _ in range(length))
+
+
+def random_int(start: int = 1, end: int = 100) -> int:
+    """
+    Generate a random int in range form start to end
+
+    :param start: range start
+    :param end: range end
+    :return: a random int
+    """
+    return randint(start, end)
+
+
+def create_users(length: int = 10) -> List[User]:
+    """
+    Generate list of dummy users
+
+    :param length: length of list
+    :return: list of dummy users
+    """
+    return [
+        User(
+            pk=randint(1, 100),
+            username=random_string(),
+            full_name=random_string(),
+            is_private=False,
+            is_verified=False,
+        ) for _ in range(length)
+    ]
+
+
+def create_feeds(length: int = 10) -> List[Feed]:
+    """
+    Generate list of dummy feed
+
+    :param length: length of list
+    :return: list of dummy users
+    """
+    return [
+        Feed(
+            pk=randint(1, 100),
+            like_count=random_int(),
+            comment_count=random_int(),
+        ) for _ in range(length)
+    ]
+
+
+def create_images(length: int = 10) -> List[Image]:
+    """
+    Generate list of dummy images
+
+    :param length: length of list
+    :return: list of dummy images
+    """
+    return [
+        Image(
+            url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.jpg',
+            width=random_int(),
+            height=random_int(),
+        ) for _ in range(length)
+    ]
+
+
+def create_videos(length: int = 10) -> List[Video]:
+    """
+    Generate list of dummy videos
+
+    :param length: length of list
+    :return: list of dummy videos
+    """
+    return [
+        Video(
+            url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.mp4',
+            width=random_int(),
+            height=random_int(),
+        ) for _ in range(length)
+    ]
 
 
 @fixture()
-def user():
+def user() -> User:
     """Fixture that return dummy user"""
-    return User(
-        pk=randint(1, 100),
-        username=random_string(),
-        full_name=random_string(),
-        is_private=False,
-        is_verified=False,
-    )
+    u, = create_users(length=1)
+    return u
 
 
 @fixture()
-def comment(user):
+def feed() -> Feed:
+    """Fixture that return dummy feed"""
+    f, = create_feeds(length=1)
+    return f
+
+
+@fixture()
+def comment(user) -> Comment:
     """Fixture that return comment with random content"""
     return Comment(
         pk=randint(1, 100),
