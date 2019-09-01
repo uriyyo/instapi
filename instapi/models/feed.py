@@ -1,4 +1,5 @@
 from typing import (
+    cast,
     Iterable,
     List,
     Optional,
@@ -82,13 +83,13 @@ class Feed(Media):
         return to_list(self.iter_resources(video=video, image=image), limit=limit)
 
     def iter_videos(self) -> Iterable['Video']:
-        return self.iter_resources(video=True, image=False)
+        return cast(Iterable['Video'], self.iter_resources(video=True, image=False))
 
     def videos(self, limit: Optional[int] = None) -> List['Video']:
         return to_list(self.iter_videos(), limit=limit)
 
     def iter_images(self) -> Iterable['Image']:
-        return self.iter_resources(video=False, image=True)
+        return cast(Iterable['Image'], self.iter_resources(video=False, image=True))
 
     def images(self, limit: Optional[int] = None) -> List['Image']:
         return to_list(self.iter_images(), limit=limit)

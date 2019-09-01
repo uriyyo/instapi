@@ -1,5 +1,6 @@
 import ssl
 from typing import (
+    Any,
     cast,
     ClassVar,
 )
@@ -19,7 +20,7 @@ class ClientProxy:
     # Used to return dummy implementation of methods
     is_testing: ClassVar[bool] = False
 
-    def __getattr__(self, item):
+    def __getattr__(self, item: str) -> Any:
         if self.obj is None:
             if self.is_testing:
                 return None

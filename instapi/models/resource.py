@@ -37,7 +37,7 @@ class Video(Resource):
 
 @dataclass(frozen=True)
 class Image(Resource):
-    def preview(self):
+    def preview(self) -> None:
         response = get(self.url)
         image = io.BytesIO(response.content)
         img = PILImage.open(image)

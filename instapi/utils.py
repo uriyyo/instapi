@@ -1,3 +1,4 @@
+from functools import partial
 from typing import (
     Callable,
     Iterable,
@@ -17,15 +18,17 @@ def process_many(
 ) -> Iterable:
     next_max_id = None
 
-    kwargs = {'rank_token': str(uuid1())} if with_rank_token else {}
-    args = (pk,) if pk is not None else ()
+    if pk is not None:
+        fetcher = partial(fetcher, pk)
+
+    if with_rank_token:
+        fetcher = partial(fetcher, rank_token=str(uuid1()))
 
     while True:
-        result = fetcher(
-            *args,
-            **kwargs,
-            **({'max_id': next_max_id} if next_max_id else {}),
-        )
+        if next_max_id is not None:
+            result = fetcher(max_id=next_max_id)
+        else:
+            result = fetcher()
 
         yield result
 
