@@ -1,5 +1,8 @@
 from instapi.models.resource import (
+    Image,
     Resource,
+    Resources,
+    Video,
 )
 from .base import (
     BaseModel,
@@ -23,5 +26,8 @@ __all__ = [
     'Feed',
     'Comment',
     'Resource',
+    'Resources',
+    'Image',
+    'Video',
     'User',
 ]
