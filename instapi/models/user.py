@@ -29,7 +29,7 @@ from instapi.utils import (
 )
 
 if TYPE_CHECKING:
-    from instapi.models.feed import Feed
+    from instapi.models.feed import Feed  # pragma: no cover
 
 
 @dataclass(frozen=True)
