@@ -1,0 +1,18 @@
+language: python
+
+install:
+  - pip install ".[testing]"
+
+matrix:
+  include:
+    - python: "3.6"
+      script:
+        - pytest --cov-report term --cov=instapi tests
+      after_success:
+        - curl -s https://codecov.io/bash | bash
+
+    - python: "3.7"
+      script: pytest tests
+
+    - python: "3.8-dev"
+      script: pytest tests
