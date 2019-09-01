@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import chain
 from typing import (
     Callable,
     Iterable,
@@ -49,8 +50,19 @@ def to_list(iterable: Iterable[T], limit: Optional[int] = None) -> List[T]:
     return [*limited(iterable, limit=limit)]
 
 
+def flat(source: List[Iterable[T]]) -> List[T]:
+    """
+    Unpack list of iterable into single list
+
+    :param source: list of iterable
+    :return: unpacked list
+    """
+    return [*chain.from_iterable(source)]
+
+
 __all__ = [
     'process_many',
     'limited',
     'to_list',
+    'flat',
 ]

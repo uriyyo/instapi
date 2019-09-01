@@ -1,4 +1,7 @@
-from random import choice
+from random import (
+    choice,
+    randint,
+)
 from string import printable
 
 from pytest import fixture
@@ -20,6 +23,17 @@ def random_string(length: int = 10, source: str = printable) -> str:
     :return: random string
     """
     return ''.join(choice(source) for _ in range(length))
+
+
+def random_int(start: int = 1, end: int = 100) -> int:
+    """
+    Generate a random int in range from start to end
+
+    :param start: range start
+    :param end: range end
+    :return: a random int
+    """
+    return randint(start, end)
 
 
 @fixture()

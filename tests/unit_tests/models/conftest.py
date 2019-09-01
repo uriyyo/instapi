@@ -1,11 +1,7 @@
-from itertools import chain
 from random import randint
 from string import ascii_letters
-
 from typing import (
     List,
-    Iterable,
-    TypeVar,
 )
 
 from pytest import fixture
@@ -19,30 +15,10 @@ from instapi.models.resource import (
     Image,
     Video,
 )
-from ..conftest import random_string
-
-T = TypeVar('T')
-
-
-def flat(source: List[Iterable[T]]) -> List[T]:
-    """
-    Unpack list of iterable into single list
-
-    :param source: list of iterable
-    :return: unpacked list
-    """
-    return [*chain.from_iterable(i for i in source)]
-
-
-def random_int(start: int = 1, end: int = 100) -> int:
-    """
-    Generate a random int in range form start to end
-
-    :param start: range start
-    :param end: range end
-    :return: a random int
-    """
-    return randint(start, end)
+from ..conftest import (
+    random_int,
+    random_string,
+)
 
 
 def create_users(length: int = 10) -> List[User]:

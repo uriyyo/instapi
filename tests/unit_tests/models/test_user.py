@@ -25,10 +25,10 @@ from .conftest import (
     create_images,
     create_users,
     create_videos,
-    flat,
     random_int,
     random_string,
 )
+from instapi.utils import flat
 
 
 @fixture()
