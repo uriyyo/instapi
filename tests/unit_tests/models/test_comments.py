@@ -6,12 +6,7 @@ def test_like_comment(comment, mocker):
     mocker.patch('instapi.client.client.comment_like')
 
     comment.like()
-
-    assert client.comment_like.call_count == 1
-
-    args, kwargs = client.comment_like.call_args
-    assert args == (comment.pk,)
-    assert kwargs == {}
+    client.comment_like.assert_called_once_with(comment.pk)
 
 
 def test_unlike_comment(comment, mocker):
@@ -20,8 +15,4 @@ def test_unlike_comment(comment, mocker):
 
     comment.unlike()
 
-    assert client.comment_unlike.call_count == 1
-
-    args, kwargs = client.comment_unlike.call_args
-    assert args == (comment.pk,)
-    assert kwargs == {}
+    client.comment_unlike.assert_called_once_with(comment.pk)
