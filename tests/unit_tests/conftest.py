@@ -27,7 +27,7 @@ def random_string(length: int = 10, source: str = printable) -> str:
 
 def random_int(start: int = 1, end: int = 100) -> int:
     """
-    Generate a random int in range form start to end
+    Generate a random int in range from start to end
 
     :param start: range start
     :param end: range end
