@@ -1,12 +1,7 @@
 from itertools import chain
-from random import (
-    choice,
-    randint,
-)
-from string import (
-    ascii_letters,
-    printable,
-)
+from random import randint
+from string import ascii_letters
+
 from typing import (
     List,
     Iterable,
@@ -24,6 +19,7 @@ from instapi.models.resource import (
     Image,
     Video,
 )
+from ..conftest import random_string
 
 T = TypeVar('T')
 
@@ -36,17 +32,6 @@ def flat(source: List[Iterable[T]]) -> List[T]:
     :return: unpacked list
     """
     return [*chain.from_iterable(i for i in source)]
-
-
-def random_string(length: int = 10, source: str = printable) -> str:
-    """
-    Generate random string from source string
-
-    :param length: length of generated string
-    :param source: source of characters to use
-    :return: random string
-    """
-    return ''.join(choice(source) for _ in range(length))
 
 
 def random_int(start: int = 1, end: int = 100) -> int:
