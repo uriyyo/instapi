@@ -4,6 +4,8 @@ InstAPI
 [![Code Style](https://img.shields.io/badge/Code%20Style-PEP%208-blueviolet)](https://www.python.org/dev/peps/pep-0008/)
 ![Contributions](https://img.shields.io/badge/Contributions-Welcome-brightgreen)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey)](https://github.com/uriyyo/instapi/blob/master/LICENSE)
+[![Build Status](https://travis-ci.com/uriyyo/instapi.svg?branch=develop)](https://travis-ci.com/uriyyo/instapi)
+[![codecov](https://codecov.io/gh/uriyyo/instapi/branch/develop/graph/badge.svg)](https://codecov.io/gh/uriyyo/instapi)
 
 InstAPI - comfortable and easy to use Python's library for interaction with Instagram.
 
