@@ -6,7 +6,7 @@ from instapi.client import client
 from instapi.models.base import Media
 
 if TYPE_CHECKING:
-    from instapi.models import User
+    from instapi.models import User  # pragma: no cover
 
 
 @dataclass(frozen=True)
