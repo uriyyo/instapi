@@ -29,6 +29,11 @@ class Feed(Media):
 
     @classmethod
     def iter_timeline(cls) -> Iterable['Feed']:
+        """
+        Create generator object to post in feed
+
+        :return: generator to post in feed
+        """
         for result in process_many(client.feed_timeline):
             yield from (
                 Feed.create(data['media_or_ad']) for data in result['feed_items']
@@ -37,6 +42,12 @@ class Feed(Media):
 
     @classmethod
     def timeline(cls, limit: Optional[int] = None) -> List['Feed']:
+        """
+        Generate list of posts from feed
+
+        :param limit: number of posts, which will be added to list
+        :return: list with posts from feed
+        """
         return to_list(cls.iter_timeline(), limit=limit)
 
     def iter_likes(self) -> Iterable['User']:
