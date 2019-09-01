@@ -14,7 +14,7 @@ from instapi.models.base import BaseModel
 @dataclass(frozen=True)
 class Resource(BaseModel):
     """
-    This class represent image or video, which contains in the post
+    This class represents image or video, which contains in the post
     """
     url: str
     width: int
@@ -47,7 +47,7 @@ class Resource(BaseModel):
 @dataclass(frozen=True)
 class Video(Resource):
     """
-    This class represent video resource
+    This class represents video resource
     """
     ...
 
@@ -55,7 +55,7 @@ class Video(Resource):
 @dataclass(frozen=True)
 class Image(Resource):
     """
-    This class represent image resource
+    This class represents image resource
     """
     def preview(self) -> None:
         """
