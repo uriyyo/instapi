@@ -3,16 +3,32 @@ language: python
 install:
   - pip install ".[testing]"
 
+env:
+  - TEST_CMD="pytest tests"
+
+script:
+  - $TEST_CMD
+
 matrix:
   include:
-    - python: "3.6"
-      script:
-        - pytest --cov-report term --cov=instapi tests
+    - name: "mypy"
+      python: "3.6"
+      env:
+        - TEST_CMD="mypy instapi"
+
+    - name: "codecov"
+      python: "3.6"
+      env:
+        - TEST_CMD="pytest --cov-report term --cov=instapi tests"
       after_success:
         - curl -s https://codecov.io/bash | bash
 
-    - python: "3.7"
-      script: pytest tests
+    - name: "3.6"
+      python: "3.6"
 
-    - python: "3.8-dev"
-      script: pytest tests
+    - name: "3.7"
+      python: "3.7"
+
+    - name: "3.8"
+      python: "3.8-dev"
+

@@ -2,6 +2,7 @@ from collections import Counter as RealCounter
 from itertools import chain
 from typing import (
     Any,
+    cast,
     Counter,
     Dict,
     Iterable,
@@ -60,34 +61,34 @@ class User(Entity):
         return cls.get(client.current_user()['user']['pk'])
 
     @property
-    def biography(self) -> int:
-        return self.user_detail()['biography']
+    def biography(self) -> str:
+        return cast(str, self.user_detail()['biography'])
 
     @property
     def media_count(self) -> int:
-        return self.user_detail()['media_count']
+        return cast(int, self.user_detail()['media_count'])
 
     @property
     def follower_count(self) -> int:
-        return self.user_detail()['follower_count']
+        return cast(int, self.user_detail()['follower_count'])
 
     @property
     def following_count(self) -> int:
-        return self.user_detail()['following_count']
+        return cast(int, self.user_detail()['following_count'])
 
     def user_detail(self) -> Dict[str, Any]:
-        return self.full_info()['user_detail']['user']
+        return cast(Dict[str, Any], self.full_info()['user_detail']['user'])
 
     def full_info(self) -> Dict[str, Any]:
-        return client.user_detail_info(self.pk)
+        return cast(Dict[str, Any], client.user_detail_info(self.pk))
 
-    def follow(self, user: 'User'):
+    def follow(self, user: 'User') -> None:
         if self != User.self():
             raise ValueError()
 
         client.friendships_create(user.pk)
 
-    def unfollow(self, user: 'User'):
+    def unfollow(self, user: 'User') -> None:
         if self != User.self():
             raise ValueError()
 

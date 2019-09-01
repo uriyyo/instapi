@@ -14,10 +14,10 @@ class Comment(Media):
     text: str
     user: 'User'
 
-    def like(self):
+    def like(self) -> None:
         client.comment_like(self.pk)
 
-    def unlike(self):
+    def unlike(self) -> None:
         client.comment_unlike(self.pk)
 
 
