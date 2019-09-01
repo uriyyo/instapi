@@ -189,17 +189,17 @@ class Feed(Media):
 
     def image(self) -> Optional['Image']:
         """
-        Return next image from post
+        Return the first image from feed if it exists.
 
-        :return: image
+        :return: image or None
         """
         return next(iter(self.iter_images()), None)
 
     def video(self) -> Optional['Video']:
         """
-        Return next video from post
+        Return the first video from feed if it exists
 
-        :return: video
+        :return: video or None
         """
         return next(iter(self.iter_videos()), None)
 
