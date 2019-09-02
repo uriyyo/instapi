@@ -1,12 +1,13 @@
 import io
+import requests
+import shutil
+
 from pathlib import Path
-from shutil import copyfileobj
 from typing import Union
 from urllib.parse import urlparse
 
 from dataclasses import dataclass
 from PIL import Image as PILImage
-from requests import get
 
 from instapi.models.base import BaseModel
 
@@ -21,27 +22,34 @@ class Resource(BaseModel):
     height: int
 
     @property
-    def file_path(self) -> Path:
+    def filename(self) -> Path:
         """
         Return the name of image/video
 
         :return: path to file
         """
-        *_, file_name = urlparse(self.url).path.split('/')
-        return Path(file_name)
+        *_, filename = urlparse(self.url).path.split('/')
+        return Path(filename)
 
-    def download(self, into: Path = None) -> None:
+    def download(self, directory: Path = None, filename: Union[Path, str] = None) -> None:
         """
         Download image/video
 
-        :param into: path for storage file
+        :param directory: path for storage file
+        :param filename: name of file, which will be downloaded
         :return: None
         """
-        into = into or self.file_path
-        response = get(self.url, stream=True)
+        filename = filename or self.filename
+
+        if directory:
+            into = directory / filename
+        else:
+            into = filename
+
+        response = requests.get(self.url, stream=True)
 
         with into.open(mode='wb') as f:
-            copyfileobj(response.raw, f)
+            shutil.copyfileobj(response.raw, f)
 
 
 @dataclass(frozen=True)
@@ -63,7 +71,7 @@ class Image(Resource):
 
         :return: None
         """
-        response = get(self.url)
+        response = requests.get(self.url)
         image = io.BytesIO(response.content)
         img = PILImage.open(image)
         img.show()
