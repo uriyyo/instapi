@@ -51,38 +51,37 @@ class TestResource:
         return resp
 
     @fixture()
-    def response(self):
-        resource_content = random_bytes()
-        response = Response()
-        response.raw = io.BytesIO(resource_content)
-
-    def test_download_with_path(self, tmp_path, mocker, resource):
+    def get_mocker(self, mocker):
         resource_content = random_bytes()
         response = Response()
         response.raw = io.BytesIO(resource_content)
 
         get_mock = mocker.patch('requests.get', return_value=response)
+        return get_mock
 
+    def test_download_without_param(self, tmp_path, get_mocker, resource):
+        resource.download()
+
+        assert resource.filename.exists()
+        resource.filename.unlink()
+
+        get_mocker.assert_called_once_with(resource.url, stream=True)
+
+    def test_download_with_path(self, tmp_path, get_mocker, resource):
         resource.download(tmp_path)
         result_path: Path = tmp_path / resource.filename
 
         assert result_path.exists()
-        get_mock.assert_called_once_with(resource.url, stream=True)
+        get_mocker.assert_called_once_with(resource.url, stream=True)
 
-    def test_download_with_path_and_filename(self, mocker, tmp_path, resource):
-        resource_content = random_bytes()
-        response = Response()
-        response.raw = io.BytesIO(resource_content)
-
-        get_mock = mocker.patch('requests.get', return_value=response)
-
+    def test_download_with_path_and_filename(self, get_mocker, tmp_path, resource):
         rand_filename = random_string(source=ascii_letters) + '.jpg'
 
         resource.download(tmp_path, rand_filename)
         result_path: Path = tmp_path / rand_filename
 
         assert result_path.exists()
-        get_mock.assert_called_once_with(resource.url, stream=True)
+        get_mocker.assert_called_once_with(resource.url, stream=True)
 
     @mark.parametrize(
         'url,filename',

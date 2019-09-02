@@ -44,7 +44,7 @@ class Resource(BaseModel):
         if directory:
             into = directory / filename
         else:
-            into = filename
+            into = Path(filename)
 
         response = requests.get(self.url, stream=True)
 

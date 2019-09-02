@@ -64,7 +64,7 @@ def create_resource(length: int = 10) -> List[Resource]:
     :return: list of dummy resources
     """
     return [
-        Image(
+        Resource(
             url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.jpg',
             width=random_int(),
             height=random_int(),
