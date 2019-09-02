@@ -14,6 +14,7 @@ from instapi.models import (
 from instapi.models.resource import (
     Image,
     Video,
+    Resource,
 )
 from ..conftest import (
     random_int,
@@ -51,6 +52,22 @@ def create_feeds(length: int = 10) -> List[Feed]:
             pk=randint(1, 100),
             like_count=random_int(),
             comment_count=random_int(),
+        ) for _ in range(length)
+    ]
+
+
+def create_resource(length: int = 10) -> List[Resource]:
+    """
+    Generate list of dummy resources
+
+    :param length: length of list
+    :return: list of dummy resources
+    """
+    return [
+        Resource(
+            url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.jpg',
+            width=random_int(),
+            height=random_int(),
         ) for _ in range(length)
     ]
 

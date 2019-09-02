@@ -6,12 +6,24 @@ from string import printable
 
 from pytest import fixture
 
+from string import ascii_letters
+
 from instapi.client import ClientProxy
 
 
 def pytest_configure():
     # Turn on testing mode for ClientProxy
     ClientProxy.is_testing = True
+
+
+def random_bytes(count: int = 10) -> bytes:
+    """
+    Generate random bytes
+
+    :param count: how many bytes will be generated
+    :return: random bytes
+    """
+    return b''.join(bytes(choice(ascii_letters), 'ascii') for _ in range(count))
 
 
 def random_string(length: int = 10, source: str = printable) -> str:
