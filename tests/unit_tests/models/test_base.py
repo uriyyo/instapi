@@ -4,11 +4,8 @@ from pytest import (
     raises,
 )
 
-from instapi.models.base import (
-    BaseModel,
-    Entity,
-    Media,
-)
+from instapi.models.base import BaseModel
+
 from tests.unit_tests.conftest import (
     random_int,
     random_string,
@@ -80,10 +77,6 @@ class TestBaseModel:
 class TestEntity:
     """Tests for Entity class"""
 
-    @fixture()
-    def entity(self):
-        return Entity(random_int())
-
     def test_entity_hash(self, entity):
         # Entity hash should be calculated base on pk field
         assert hash(entity) == hash(entity.pk)
@@ -91,10 +84,6 @@ class TestEntity:
 
 class TestMedia:
     """Tests for Media class"""
-
-    @fixture()
-    def media(self):
-        return Media(random_int())
 
     def test_media_info(self, media, mocker):
         items = [[*range(100)]]

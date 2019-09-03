@@ -20,15 +20,17 @@ from instapi.models.resource import (
     Resources,
     Video,
 )
+from instapi.utils import flat
 from .conftest import (
     create_feeds,
     create_images,
     create_users,
     create_videos,
+)
+from ..conftest import (
     random_int,
     random_string,
 )
-from instapi.utils import flat
 
 
 @fixture()

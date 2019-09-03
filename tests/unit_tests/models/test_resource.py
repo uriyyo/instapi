@@ -1,28 +1,24 @@
 import io
-
-from pytest import fixture, mark
-from string import ascii_letters
-from instapi import Resource
-from .conftest import (
-    create_images,
-    create_resource,
-)
-
-from ..conftest import random_bytes, random_string
-
-from requests import Response
 from pathlib import Path
+from string import ascii_letters
+
+from pytest import (
+    fixture,
+    mark,
+)
+from requests import Response
+
+from instapi import Resource
+from ..conftest import (
+    random_bytes,
+    random_string,
+)
 
 
 class TestImage:
     """
     Test for Image class
     """
-
-    @fixture()
-    def image(self):
-        im, = create_images(length=1)
-        return im
 
     def test_image(self, mocker, image):
         image_content = random_bytes()
@@ -44,11 +40,6 @@ class TestResource:
     """
     Test for Resource class
     """
-
-    @fixture()
-    def resource(self):
-        resp, = create_resource(length=1)
-        return resp
 
     @fixture()
     def get_mocker(self, mocker):

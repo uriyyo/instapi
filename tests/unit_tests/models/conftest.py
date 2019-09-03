@@ -1,24 +1,24 @@
-from random import randint
-from string import ascii_letters
-from typing import (
-    List,
-)
+from functools import partial
+from typing import List
 
 from pytest import fixture
 
 from instapi.models import (
     Comment,
+    Entity,
     Feed,
+    Media,
     User,
 )
 from instapi.models.resource import (
     Image,
-    Video,
     Resource,
+    Video,
 )
 from ..conftest import (
-    random_int,
-    random_string,
+    rand,
+    random_url,
+    rands,
 )
 
 
@@ -29,15 +29,7 @@ def create_users(length: int = 10) -> List[User]:
     :param length: length of list
     :return: list of dummy users
     """
-    return [
-        User(
-            pk=randint(1, 100),
-            username=random_string(),
-            full_name=random_string(),
-            is_private=False,
-            is_verified=False,
-        ) for _ in range(length)
-    ]
+    return rands(User, length)
 
 
 def create_feeds(length: int = 10) -> List[Feed]:
@@ -47,13 +39,7 @@ def create_feeds(length: int = 10) -> List[Feed]:
     :param length: length of list
     :return: list of dummy users
     """
-    return [
-        Feed(
-            pk=randint(1, 100),
-            like_count=random_int(),
-            comment_count=random_int(),
-        ) for _ in range(length)
-    ]
+    return rands(Feed, length)
 
 
 def create_resource(length: int = 10) -> List[Resource]:
@@ -63,13 +49,7 @@ def create_resource(length: int = 10) -> List[Resource]:
     :param length: length of list
     :return: list of dummy resources
     """
-    return [
-        Resource(
-            url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.jpg',
-            width=random_int(),
-            height=random_int(),
-        ) for _ in range(length)
-    ]
+    return rands(Resource, length, url=random_url)
 
 
 def create_images(length: int = 10) -> List[Image]:
@@ -79,13 +59,7 @@ def create_images(length: int = 10) -> List[Image]:
     :param length: length of list
     :return: list of dummy images
     """
-    return [
-        Image(
-            url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.jpg',
-            width=random_int(),
-            height=random_int(),
-        ) for _ in range(length)
-    ]
+    return rands(Image, length, url=random_url)
 
 
 def create_videos(length: int = 10) -> List[Video]:
@@ -95,13 +69,7 @@ def create_videos(length: int = 10) -> List[Video]:
     :param length: length of list
     :return: list of dummy videos
     """
-    return [
-        Video(
-            url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.mp4',
-            width=random_int(),
-            height=random_int(),
-        ) for _ in range(length)
-    ]
+    return rands(Video, length, url=partial(random_url, '.mp4'))
 
 
 @fixture()
@@ -109,6 +77,32 @@ def user() -> User:
     """Fixture that return dummy user"""
     u, = create_users(length=1)
     return u
+
+
+@fixture()
+def entity():
+    """Fixture that return dummy entity"""
+    return rand(Entity)
+
+
+@fixture()
+def media():
+    """Fixture that return dummy media"""
+    return rand(Media)
+
+
+@fixture()
+def image():
+    """Fixture that return dummy image"""
+    im, = create_images(length=1)
+    return im
+
+
+@fixture()
+def resource():
+    """Fixture that return dummy resource"""
+    resp, = create_resource(length=1)
+    return resp
 
 
 @fixture()
@@ -121,8 +115,4 @@ def feed() -> Feed:
 @fixture()
 def comment(user) -> Comment:
     """Fixture that return comment with random content"""
-    return Comment(
-        pk=randint(1, 100),
-        text='Random text',
-        user=user,
-    )
+    return rand(Comment)
