@@ -20,6 +20,13 @@ from ..conftest import (
 
 class TestFeed:
 
+    @staticmethod
+    def _dump_comment(comment):
+        return {
+            **vars(comment),
+            'user': vars(comment.user)
+        }
+
     def test_like(self, mocker, feed):
         mocker.patch('instapi.client.client.post_like')
 
@@ -74,7 +81,7 @@ class TestFeed:
         assert len(likes) == limit
 
     def test_iter_comments(self, mocker, feed):
-        media_comments = {'comments': [*map(vars, create_comments())]}
+        media_comments = {'comments': [*map(self._dump_comment, create_comments())]}
         mocker.patch('instapi.client.client.media_comments', return_value=media_comments)
 
         unpack = [*feed.iter_comments()]
@@ -82,7 +89,7 @@ class TestFeed:
         assert len(unpack) == len(media_comments['comments'])
 
     def test_comments_without_limit(self, mocker, feed):
-        media_comments = {'comments': [*map(vars, create_comments())]}
+        media_comments = {'comments': [*map(self._dump_comment, create_comments())]}
         mocker.patch('instapi.client.client.media_comments', return_value=media_comments)
 
         comments = feed.comments()
@@ -91,7 +98,7 @@ class TestFeed:
         assert len(comments) == len(media_comments['comments'])
 
     def test_comments_with_limit(self, mocker, feed):
-        media_comments = {'comments': [*map(vars, create_comments())]}
+        media_comments = {'comments': [*map(self._dump_comment, create_comments())]}
         mocker.patch('instapi.client.client.media_comments', return_value=media_comments)
 
         limit = random_int(0, len(media_comments['comments']))

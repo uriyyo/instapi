@@ -19,6 +19,7 @@ from ..conftest import (
     rand,
     random_url,
     rands,
+    random_int,
 )
 
 
@@ -69,29 +70,7 @@ def create_comments(length: int = 10) -> List[Comment]:
     :param length: length of list
     :return: list of dummy comments
     """
-    return [
-        Comment(
-            text=random_string(),
-            user=vars(create_users(length=1)[0]),
-            pk=random_int(),
-        ) for _ in range(length)
-    ]
-
-
-def create_feeds(length: int = 10) -> List[Feed]:
-    """
-    Generate list of dummy feeds
-
-    :param length: length of list
-    :return: list of dummy feeds
-    """
-    return [
-        Feed(
-            like_count=random_int(),
-            comment_count=random_int(),
-            pk=random_int(),
-        ) for _ in range(length)
-    ]
+    return rands(Comment, length)
 
 
 def create_videos(length: int = 10) -> List[Video]:
@@ -107,8 +86,11 @@ def create_videos(length: int = 10) -> List[Video]:
 @fixture()
 def user() -> User:
     """Fixture that return dummy user"""
-    u, = create_users(length=1)
-    return u
+    # User id must not be in range from 1 to 100 because
+    # randomly generated users have same the range
+    # so user fixture will return user with pk in range
+    # from 101 to 200 to avoid fails at random tests
+    return rand(User, pk=partial(random_int, 101, 200))
 
 
 @fixture()
