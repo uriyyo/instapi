@@ -6,6 +6,7 @@ from instapi.exceptions import (
 )
 from instapi.models import (
     Comment,
+    Candidate,
     Feed,
     Image,
     Resource,
@@ -18,6 +19,7 @@ __all__ = [
     'bind',
     'ClientNotInitedException',
     'Comment',
+    'Candidate',
     'Feed',
     'Image',
     'Resource',

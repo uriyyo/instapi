@@ -11,6 +11,7 @@ from .conftest import (
     create_feeds,
     create_videos,
     create_images,
+    as_dicts,
 )
 
 from ..conftest import (
@@ -19,13 +20,6 @@ from ..conftest import (
 
 
 class TestFeed:
-
-    @staticmethod
-    def _dump_comment(comment):
-        return {
-            **vars(comment),
-            'user': vars(comment.user)
-        }
 
     def test_like(self, mocker, feed):
         mocker.patch('instapi.client.client.post_like')
@@ -81,7 +75,7 @@ class TestFeed:
         assert len(likes) == limit
 
     def test_iter_comments(self, mocker, feed):
-        media_comments = {'comments': [*map(self._dump_comment, create_comments())]}
+        media_comments = {'comments': as_dicts(create_comments())}
         mocker.patch('instapi.client.client.media_comments', return_value=media_comments)
 
         unpack = [*feed.iter_comments()]
@@ -89,7 +83,7 @@ class TestFeed:
         assert len(unpack) == len(media_comments['comments'])
 
     def test_comments_without_limit(self, mocker, feed):
-        media_comments = {'comments': [*map(self._dump_comment, create_comments())]}
+        media_comments = {'comments': as_dicts(create_comments())}
         mocker.patch('instapi.client.client.media_comments', return_value=media_comments)
 
         comments = feed.comments()
@@ -98,7 +92,7 @@ class TestFeed:
         assert len(comments) == len(media_comments['comments'])
 
     def test_comments_with_limit(self, mocker, feed):
-        media_comments = {'comments': [*map(self._dump_comment, create_comments())]}
+        media_comments = {'comments': as_dicts(create_comments())}
         mocker.patch('instapi.client.client.media_comments', return_value=media_comments)
 
         limit = random_int(0, len(media_comments['comments']))
@@ -134,7 +128,7 @@ class TestFeed:
 
     def test_iter_resources_videos_without_carusel(self, mocker, feed):
         video, = create_videos(length=1)
-        media_info = {'video_versions': [vars(video)]}
+        media_info = video.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         resources = [*feed.iter_resources()]
@@ -142,7 +136,7 @@ class TestFeed:
 
     def test_iter_resources_images_without_carusel(self, mocker, feed):
         image, = create_images(length=1)
-        media_info = {'image_versions2': {'candidates': [vars(image)]}}
+        media_info = image.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         resources = [*feed.iter_resources()]
@@ -150,56 +144,56 @@ class TestFeed:
 
     def test_resources_videos(self, mocker, feed):
         video, = create_videos(length=1)
-        media_info = {'video_versions': [vars(video)]}
+        media_info = video.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert feed.resources() == [video]
 
     def test_resources_images(self, mocker, feed):
         image, = create_images(length=1)
-        media_info = {'image_versions2': {'candidates': [vars(image)]}}
+        media_info = image.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert feed.resources() == [image]
 
     def test_iter_videos(self, mocker, feed):
         video, = create_videos(length=1)
-        media_info = {'video_versions': [vars(video)]}
+        media_info = video.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert [*feed.iter_videos()] == [video]
 
     def test_videos(self, mocker, feed):
         video, = create_videos(length=1)
-        media_info = {'video_versions': [vars(video)]}
+        media_info = video.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert feed.videos() == [video]
 
     def test_iter_images(self, mocker, feed):
         image, = create_images(length=1)
-        media_info = {'image_versions2': {'candidates': [vars(image)]}}
+        media_info = image.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert [*feed.iter_images()] == [image]
 
     def test_images(self, mocker, feed):
         image, = create_images(length=1)
-        media_info = {'image_versions2': {'candidates': [vars(image)]}}
+        media_info = image.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert feed.images() == [image]
 
     def test_video(self, mocker, feed):
         video, = create_videos(length=1)
-        media_info = {'video_versions': [vars(video)]}
+        media_info = video.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert feed.video() == video
 
     def test_image(self, mocker, feed):
         image, = create_images(length=1)
-        media_info = {'image_versions2': {'candidates': [vars(image)]}}
+        media_info = image.as_dict()
         mocker.patch('instapi.models.base.Media._media_info', return_value=media_info)
 
         assert feed.image() == image
