@@ -1,5 +1,11 @@
 from functools import partial
-from typing import List
+from typing import (
+    Iterable,
+    List,
+    Type,
+    TypeVar,
+    Tuple,
+)
 
 from pytest import fixture
 
@@ -11,16 +17,30 @@ from instapi.models import (
     User,
 )
 from instapi.models.resource import (
+    Candidate,
     Image,
     Resource,
     Video,
 )
 from ..conftest import (
     rand,
+    random_int,
     random_url,
     rands,
     random_int,
 )
+
+T = TypeVar('T')
+
+
+def as_dicts(models: Iterable[T]) -> List[T]:
+    """
+    Convert models into list of their dict representations
+
+    :param models: iterable of models
+    :return: list of dicts
+    """
+    return [m.as_dict() for m in models]
 
 
 def create_users(length: int = 10) -> List[User]:
@@ -43,14 +63,35 @@ def create_feeds(length: int = 10) -> List[Feed]:
     return rands(Feed, length)
 
 
-def create_resource(length: int = 10) -> List[Resource]:
+def create_candidates(length: int = 10, extension: str = '.jpg') -> Tuple[Candidate]:
+    """
+    Generate list of dummy resource candidates
+
+    :param length: length of list
+    :param extension: resource extension
+    :return: list of dummy candidates
+    """
+    return tuple(rand(Candidate, url=random_url(extension)) for _ in range(length))
+
+
+def create_resource(
+        length: int = 10,
+        extension: str = '.jpg',
+        resource_cls: Type[T] = Resource,
+) -> List[T]:
     """
     Generate list of dummy resources
 
     :param length: length of list
+    :param extension: resource extension
+    :param resource_cls: resource class
     :return: list of dummy resources
     """
-    return rands(Resource, length, url=random_url)
+    return rands(
+        resource_cls,
+        length,
+        candidates=partial(create_candidates, length=1, extension=extension),
+    )
 
 
 def create_images(length: int = 10) -> List[Image]:
@@ -60,7 +101,7 @@ def create_images(length: int = 10) -> List[Image]:
     :param length: length of list
     :return: list of dummy images
     """
-    return rands(Image, length, url=random_url)
+    return create_resource(resource_cls=Image, length=length)
 
 
 def create_comments(length: int = 10) -> List[Comment]:
@@ -80,7 +121,7 @@ def create_videos(length: int = 10) -> List[Video]:
     :param length: length of list
     :return: list of dummy videos
     """
-    return rands(Video, length, url=partial(random_url, '.mp4'))
+    return create_resource(resource_cls=Video, extension='.mp4', length=length)
 
 
 @fixture()
@@ -124,6 +165,13 @@ def feed() -> Feed:
     """Fixture that return dummy feed"""
     f, = create_feeds(length=1)
     return f
+
+
+@fixture()
+def candidate() -> Candidate:
+    """Fixture that return dummy candidate"""
+    c, = create_candidates(length=1)
+    return c
 
 
 @fixture()

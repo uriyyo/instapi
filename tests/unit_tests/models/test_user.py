@@ -26,6 +26,7 @@ from .conftest import (
     create_images,
     create_users,
     create_videos,
+    as_dicts,
 )
 from ..conftest import (
     random_int,
@@ -413,8 +414,8 @@ def test_stories(user, mocker):
     expected = [*videos, *images]
 
     return_value = {'reel': {'items': flat([
-        [{'video_versions': [vars(v)]} for v in videos],
-        [{'image_versions2': {'candidates': [vars(i)]}} for i in images],
+        as_dicts(videos),
+        as_dicts(images),
     ])}}
 
     mocker.patch('instapi.client.client.user_story_feed', return_value=return_value)

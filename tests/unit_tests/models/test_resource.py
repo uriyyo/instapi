@@ -5,14 +5,24 @@ from string import ascii_letters
 from pytest import (
     fixture,
     mark,
+    raises,
 )
 from requests import Response
 
 from instapi import Resource
+from instapi.models.resource import Candidate
 from ..conftest import (
     random_bytes,
     random_string,
 )
+
+
+@fixture
+def mock_content(mocker):
+    content = random_bytes()
+    mock = mocker.patch('instapi.Candidate.content', side_effect=lambda: io.BytesIO(content))
+
+    return mock, content
 
 
 class TestImage:
@@ -20,29 +30,23 @@ class TestImage:
     Test for Image class
     """
 
+    @mark.usefixtures('mock_content')
     def test_image(self, mocker, image):
-        image_content = random_bytes()
-        response = Response()
-        response._content = image_content
-
-        get_mock = mocker.patch('requests.get', return_value=response)
         image_mock = mocker.Mock()
         open_mock = mocker.patch('PIL.Image.open', return_value=image_mock)
 
         image.preview()
 
-        get_mock.assert_called_once_with(image.url)
-        assert open_mock.call_args[0][0].read() == image_content
         open_mock.show.called_once()
 
 
-class TestResource:
+class TestCandidate:
     """
-    Test for Resource class
+    Test for Candidate class
     """
 
-    @fixture()
-    def get_mocker(self, mocker):
+    @fixture
+    def mock_requests_get(self, mocker):
         resource_content = random_bytes()
         response = Response()
         response.raw = io.BytesIO(resource_content)
@@ -92,6 +96,60 @@ class TestResource:
             ['https://instapi/images/sasha.jpg?age=too_old&for=school', 'sasha.jpg'],
         ]
     )
-    def test_file_path(self, resource, url, filename):
-        r = Resource(url, 0, 0)
+    def test_filename(self, resource, url, filename):
+        r = Candidate(0, 0, url)
         assert r.filename == Path(filename)
+
+    def test_candidate_content(self, mocker, candidate):
+        resource_content = random_bytes()
+        response = mocker.Mock()
+        response.raw = io.BytesIO(resource_content)
+        get_mock = mocker.patch('requests.get', return_value=response)
+
+        content = candidate.content()
+        assert content.read() == resource_content
+
+        get_mock.assert_called_with(candidate.url, stream=True)
+
+    @mark.usefixtures('mock_content')
+    def test_download_without_param(self, tmp_path, candidate):
+        candidate.download()
+
+        assert candidate.filename.exists()
+        candidate.filename.unlink()
+
+    @mark.usefixtures('mock_content')
+    def test_download_with_path(self, tmp_path, candidate):
+        candidate.download(tmp_path)
+        result_path: Path = tmp_path / candidate.filename
+
+        assert result_path.exists()
+
+    @mark.usefixtures('mock_content')
+    def test_download_with_path_and_filename(self, tmp_path, resource):
+        rand_filename = random_string(source=ascii_letters) + '.jpg'
+
+        resource.download(tmp_path, rand_filename)
+        result_path: Path = tmp_path / rand_filename
+
+        assert result_path.exists()
+
+
+class TestResource:
+    """
+    Test for Resource class
+    """
+
+    @mark.parametrize(
+        'data',
+        [
+            [{}],
+            [{'invalid_key': []}],
+        ]
+    )
+    def test_from_data_invalid_data(self, data):
+        assert Resource.from_data(data) is None
+
+    def test_resource_with_no_candidates(self):
+        with raises(ValueError):
+            Resource(())

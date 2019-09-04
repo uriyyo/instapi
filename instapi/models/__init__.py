@@ -1,5 +1,6 @@
 from instapi.models.resource import (
     Image,
+    Candidate,
     Resource,
     Resources,
     Video,
@@ -25,6 +26,7 @@ __all__ = [
     'Media',
     'Feed',
     'Comment',
+    'Candidate',
     'Resource',
     'Resources',
     'Image',

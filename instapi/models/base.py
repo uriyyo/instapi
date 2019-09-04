@@ -10,6 +10,7 @@ from typing import (
 )
 
 from dataclasses import (
+    asdict,
     dataclass,
     field,
     Field,
@@ -17,7 +18,7 @@ from dataclasses import (
 
 from instapi.client import client
 
-ModelT = TypeVar('ModelT')
+ModelT = TypeVar('ModelT', bound='BaseModel', covariant=True)
 
 
 @dataclass(frozen=True)
@@ -30,9 +31,22 @@ class BaseModel:
         return cls.__dataclass_fields__.keys() - {'__dataclass_fields__'}
 
     @classmethod
-    def create(cls: Type[ModelT], data: Dict[str, Any]) -> ModelT:
+    def create(cls: Type[ModelT], data: Any) -> ModelT:
         # noinspection PyArgumentList
         return cls(**{k: data[k] for k in cls.fields()})  # type: ignore
+
+    def as_dict(self) -> Dict[str, Any]:
+        """
+        Convert model into native instagram representation.
+        Should be overridden at delivered classes if model
+        has specific representation.
+
+        :return: native instagram representation
+        """
+        return {
+            key: value.as_dict() if isinstance(value, BaseModel) else value
+            for key, value in asdict(self).items()
+        }
 
 
 @dataclass(frozen=True)
@@ -41,6 +55,10 @@ class Entity(BaseModel):
 
     def __hash__(self) -> int:
         return hash(self.pk)
+
+    @classmethod
+    def create(cls: Type[ModelT], data: Dict[str, Any]) -> ModelT:
+        return super().create(data)
 
 
 @dataclass(frozen=True)
@@ -55,4 +73,5 @@ __all__ = [
     'BaseModel',
     'Entity',
     'Media',
+    'ModelT',
 ]

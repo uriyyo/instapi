@@ -107,7 +107,7 @@ def rand(cls: Type[T], **kwargs) -> T:
     if not is_dataclass(cls):
         raise TypeError("Can create random instances only of dataclass classes")
 
-    fields_info = {f: cls.__dataclass_fields__[f] for f in cls.fields()}
+    fields_info = {f: cls.__dataclass_fields__[f] for f in cls.fields() if f not in kwargs}
 
     return cls(**{
         **{name: _get_rand_type(field.type) for name, field in fields_info.items()},
