@@ -42,10 +42,10 @@ def create_users(length: int = 10) -> List[User]:
 
 def create_feeds(length: int = 10) -> List[Feed]:
     """
-    Generate list of dummy feed
+    Generate list of dummy feeds
 
     :param length: length of list
-    :return: list of dummy users
+    :return: list of dummy feeds
     """
     return [
         Feed(
@@ -84,6 +84,38 @@ def create_images(length: int = 10) -> List[Image]:
             url=f'http://{random_string(source=ascii_letters)}.com/{random_string(source=ascii_letters)}.jpg',
             width=random_int(),
             height=random_int(),
+        ) for _ in range(length)
+    ]
+
+
+def create_comments(length: int = 10) -> List[Comment]:
+    """
+    Generate list of dummy comments
+
+    :param length: length of list
+    :return: list of dummy comments
+    """
+    return [
+        Comment(
+            text=random_string(),
+            user=vars(create_users(length=1)[0]),
+            pk=random_int(),
+        ) for _ in range(length)
+    ]
+
+
+def create_feeds(length: int = 10) -> List[Feed]:
+    """
+    Generate list of dummy feeds
+
+    :param length: length of list
+    :return: list of dummy feeds
+    """
+    return [
+        Feed(
+            like_count=random_int(),
+            comment_count=random_int(),
+            pk=random_int(),
         ) for _ in range(length)
     ]
 

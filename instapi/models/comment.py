@@ -11,13 +11,26 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class Comment(Media):
+    """
+    This class represents a comment in Instagram
+    """
     text: str
     user: 'User'
 
     def like(self) -> None:
+        """
+        Like comment
+
+        :return: None
+        """
         client.comment_like(self.pk)
 
     def unlike(self) -> None:
+        """
+        Unlike comment
+
+        :return: None
+        """
         client.comment_unlike(self.pk)
 
 
