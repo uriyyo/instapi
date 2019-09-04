@@ -50,6 +50,16 @@ class TestResource:
         get_mock = mocker.patch('requests.get', return_value=response)
         return get_mock
 
+    @mark.parametrize(
+        'data',
+        [
+            [{}],
+            [{'invalid_key': []}],
+        ]
+    )
+    def test_from_data_invalid_data(self, data):
+        assert Resource.from_data(data) is None
+
     def test_download_without_param(self, tmp_path, get_mocker, resource):
         resource.download()
 
