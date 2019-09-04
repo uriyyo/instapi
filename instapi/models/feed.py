@@ -14,6 +14,7 @@ from instapi.models.resource import (
     Image,
     Resources,
     Video,
+    Resource,
 )
 from instapi.models.user import User
 from instapi.utils import (
@@ -136,11 +137,7 @@ class Feed(Media):
         media_info = self._media_info()
         carousel_media = media_info.get('carousel_media', [media_info])
 
-        for media in carousel_media:
-            if 'video_versions' in media and video:
-                yield Video.create(media['video_versions'][0])
-            elif 'video_versions' not in media and image:
-                yield Image.create(media['image_versions2']['candidates'][0])
+        return Resource.create_resources(carousel_media, video=video, image=image)
 
     def resources(self, video: bool = True, image: bool = True, limit: Optional[int] = None) -> List[Resources]:
         """

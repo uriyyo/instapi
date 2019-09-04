@@ -156,11 +156,8 @@ class User(Entity):
         return to_list(self.iter_liked_by_user(user), limit=limit)
 
     def iter_stories(self) -> Iterable['Resources']:
-        for result in (client.user_story_feed(self.pk)['reel'] or {}).get('items', ()):
-            if 'video_versions' in result:
-                yield Video.create(result['video_versions'][0])
-            else:
-                yield Image.create(result['image_versions2']['candidates'][0])
+        items = (client.user_story_feed(self.pk)['reel'] or {}).get('items', ())
+        return Resource.create_resources(items)
 
     def stories(self, limit: Optional[int] = None) -> List['Resources']:
         return to_list(self.iter_stories(), limit=limit)
