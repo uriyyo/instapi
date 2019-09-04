@@ -41,14 +41,33 @@ class User(Entity):
 
     @classmethod
     def get(cls, pk: int) -> 'User':
+        """
+        Create User object from unique user's identifier
+
+        :param pk: unique user's identifier
+        :return: User object
+        """
         return cls.create(client.user_info(pk)['user'])
 
     @classmethod
     def from_username(cls, username: str) -> 'User':
+        """
+        Create User object from username
+
+        :param username: name of user
+        :return: User object
+        """
         return cls.create(client.username_info(username)['user'])
 
     @classmethod
     def match_username(cls, username: str, limit: Optional[int] = None) -> List['User']:
+        """
+        Search users by username
+
+        :param username: username
+        :param limit: size of resulting list
+        :return: list of User objects
+        """
         response = client.search_users(
             query=username,
             **({'count': limit} if limit is not None else {}),
@@ -58,22 +77,47 @@ class User(Entity):
 
     @classmethod
     def self(cls) -> 'User':
+        """
+        Create User object from current user
+
+        :return: User object
+        """
         return cls.get(client.current_user()['user']['pk'])
 
     @property
     def biography(self) -> str:
+        """
+        Return biography of user
+
+        :return: string
+        """
         return cast(str, self.user_detail()['biography'])
 
     @property
     def media_count(self) -> int:
+        """
+        Return user's count of post
+
+        :return: number
+        """
         return cast(int, self.user_detail()['media_count'])
 
     @property
     def follower_count(self) -> int:
+        """
+        Return user's count of followers
+
+        :return: number
+        """
         return cast(int, self.user_detail()['follower_count'])
 
     @property
     def following_count(self) -> int:
+        """
+        Return count of people, on which user followed
+
+        :return: number
+        """
         return cast(int, self.user_detail()['following_count'])
 
     def user_detail(self) -> Dict[str, Any]:
@@ -83,12 +127,24 @@ class User(Entity):
         return cast(Dict[str, Any], client.user_detail_info(self.pk))
 
     def follow(self, user: 'User') -> None:
+        """
+        Follow on user
+
+        :param user: User object
+        :return: None
+        """
         if self != User.self():
             raise ValueError()
 
         client.friendships_create(user.pk)
 
     def unfollow(self, user: 'User') -> None:
+        """
+        Unfollow from user
+
+        :param user: User object
+        :return: None
+        """
         if self != User.self():
             raise ValueError()
 
@@ -123,10 +179,21 @@ class User(Entity):
         return to_list(self.iter_followers(), limit=limit)
 
     def iter_followings(self) -> Iterable['User']:
+        """
+        Create generator for followers
+
+        :return: generator with User objects
+        """
         for result in process_many(client.user_following, self.pk, with_rank_token=True):
             yield from map(User.create, result['users'])
 
     def followings(self, limit: Optional[int] = None) -> List['User']:
+        """
+        Generate list of followers
+
+        :param limit: number of images, which will be added to the list
+        :return: list with User objects
+        """
         return to_list(self.iter_followings(), limit=limit)
 
     def iter_feeds(self) -> Iterable['Feed']:
