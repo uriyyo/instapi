@@ -9,6 +9,14 @@ __version__ = '0.0.1'
 
 README: Path = Path(__file__).parent / 'README.md'
 
+test_requirements = [
+    'pytest==5.1.2',
+    'pytest-mock==1.10.4',
+    'pytest-cov==2.7.1',
+    'mypy==0.720',
+    'pre-commit==1.18.3 ',
+]
+
 setup(
     name='instapi',
     version=__version__,
@@ -28,12 +36,11 @@ setup(
         'requests==2.22.0',
     ],
     extras_require={
-        'testing': [
-            'pytest==5.1.2',
-            'pytest-mock==1.10.4',
-            'pytest-cov==2.7.1',
-            'mypy==0.720',
-        ],
+        'testing': test_requirements,
+        'dev': [
+            *test_requirements,
+            'pre-commit==1.18.3 ',
+        ]
     },
     classifiers=[
         'Operating System :: OS Independent',
