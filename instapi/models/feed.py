@@ -174,7 +174,7 @@ class Feed(Media):
         """
         Create generator for iteration over images, which contains in the post
 
-        :return: generator with image, which contains in the post
+        :return: generator with images, which contains in the post
         """
         return cast(Iterable['Image'], self.iter_resources(video=False, image=True))
 
