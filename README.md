@@ -8,7 +8,7 @@ InstAPI
 [![codecov](https://codecov.io/gh/uriyyo/instapi/branch/develop/graph/badge.svg)](https://codecov.io/gh/uriyyo/instapi)
 
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/uriyyo/instapi/gh-pages/logo.svg" alt="Instapi" width="256" height="256">
+  <img src="https://user-images.githubusercontent.com/52821952/64380272-550adf80-d039-11e9-8680-67ab57c68efb.png" alt="Instapi" width="256" height="256">
 </h1>
 
 InstAPI - comfortable and easy to use Python's library for interaction with Instagram.
