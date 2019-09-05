@@ -22,7 +22,7 @@ from PIL import Image as PILImage
 
 from instapi.models.base import (
     BaseModel,
-    ModelT,
+    ModelT_co,
 )
 
 
@@ -85,7 +85,7 @@ class Resource(BaseModel):
             raise ValueError("Candidates can't be empty")
 
     @classmethod
-    def create(cls: Type[ModelT], data: Iterable[Dict[str, Any]]) -> ModelT:
+    def create(cls: Type[ModelT_co], data: Iterable[Dict[str, Any]]) -> ModelT_co:
         """
         Create Resource from iterable of candidates
 

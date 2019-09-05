@@ -18,10 +18,8 @@ from dataclasses import (
 from instapi.client import client
 from instapi.models.base import Entity
 from instapi.models.resource import (
-    Image,
     Resource,
     Resources,
-    Video,
 )
 from instapi.utils import (
     process_many,

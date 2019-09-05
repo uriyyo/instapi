@@ -18,7 +18,7 @@ from dataclasses import (
 
 from instapi.client import client
 
-ModelT = TypeVar('ModelT', bound='BaseModel', covariant=True)
+ModelT_co = TypeVar('ModelT_co', bound='BaseModel', covariant=True)
 
 
 @dataclass(frozen=True)
@@ -31,7 +31,7 @@ class BaseModel:
         return cls.__dataclass_fields__.keys() - {'__dataclass_fields__'}
 
     @classmethod
-    def create(cls: Type[ModelT], data: Any) -> ModelT:
+    def create(cls: Type[ModelT_co], data: Any) -> ModelT_co:
         # noinspection PyArgumentList
         return cls(**{k: data[k] for k in cls.fields()})  # type: ignore
 
@@ -57,7 +57,7 @@ class Entity(BaseModel):
         return hash(self.pk)
 
     @classmethod
-    def create(cls: Type[ModelT], data: Dict[str, Any]) -> ModelT:
+    def create(cls: Type[ModelT_co], data: Dict[str, Any]) -> ModelT_co:
         return super().create(data)
 
 
@@ -73,5 +73,5 @@ __all__ = [
     'BaseModel',
     'Entity',
     'Media',
-    'ModelT',
+    'ModelT_co',
 ]
