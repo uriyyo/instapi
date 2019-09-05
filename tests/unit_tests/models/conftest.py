@@ -2,9 +2,9 @@ from functools import partial
 from typing import (
     Iterable,
     List,
+    Tuple,
     Type,
     TypeVar,
-    Tuple,
 )
 
 from pytest import fixture
@@ -27,7 +27,6 @@ from ..conftest import (
     random_int,
     random_url,
     rands,
-    random_int,
 )
 
 T = TypeVar('T')
@@ -131,7 +130,7 @@ def user() -> User:
     # randomly generated users have same the range
     # so user fixture will return user with pk in range
     # from 101 to 200 to avoid fails at random tests
-    return rand(User, pk=partial(random_int, 101, 200))
+    return rand(User, pk=random_int(101, 200))
 
 
 @fixture()
@@ -178,3 +177,28 @@ def candidate() -> Candidate:
 def comment(user) -> Comment:
     """Fixture that return comment with random content"""
     return rand(Comment)
+
+
+@fixture
+def users():
+    return create_users()
+
+
+@fixture
+def comments():
+    return create_comments()
+
+
+@fixture
+def feeds():
+    return create_feeds()
+
+
+@fixture
+def videos():
+    return create_videos(length=1)
+
+
+@fixture
+def images():
+    return create_images(length=1)
