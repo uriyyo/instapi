@@ -33,7 +33,7 @@ class BaseModel:
     @classmethod
     def create(cls: Type[ModelT_co], data: Any) -> ModelT_co:
         # noinspection PyArgumentList
-        return cls(**{k: data[k] for k in cls.fields()})  # type: ignore
+        return cls(**{k: data[k] for k in cls.fields() if k in data})  # type: ignore
 
     def as_dict(self) -> Dict[str, Any]:
         """
