@@ -23,8 +23,8 @@ Usage
 -----
 Example how to like all feeds for user
 ```python
-from instapi.client import bind
-from instapi.models import User
+from instapi import bind
+from instapi import User
 
 bind('your_username_here', 'your_password_here')
 
@@ -35,6 +35,13 @@ instagram_profile = User.from_username('username')
 for feed in instagram_profile.iter_feeds():
   feed.like()
 ```
+
+Install requires
+----------------
+* dataclasses (version 0.6.0)
+* instagram-private-api (version 1.6.0.0)
+* Pillow (version 6.1.0)
+* requests (version 2.22.0)
 
 Release History
 ---------------
