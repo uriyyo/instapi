@@ -5,7 +5,6 @@ from typing import (
     cast,
     ClassVar,
     Dict,
-    SupportsInt,
     Type,
     TypeVar,
 )
@@ -18,7 +17,6 @@ from dataclasses import (
 )
 
 from instapi.client import client
-from instapi.types import StrDict
 
 ModelT_co = TypeVar('ModelT_co', bound='BaseModel', covariant=True)
 
@@ -37,7 +35,7 @@ class BaseModel:
         # noinspection PyArgumentList
         return cls(**{k: data[k] for k in cls.fields() if k in data})  # type: ignore
 
-    def as_dict(self) -> StrDict:
+    def as_dict(self) -> Dict[str, Any]:
         """
         Convert model into native instagram representation.
         Should be overridden at delivered classes if model
@@ -52,26 +50,23 @@ class BaseModel:
 
 
 @dataclass(frozen=True)
-class Entity(BaseModel, SupportsInt):
+class Entity(BaseModel):
     pk: int = field(repr=False)
 
     def __hash__(self) -> int:
         return hash(self.pk)
 
-    def __int__(self) -> int:
-        return self.pk
-
     @classmethod
-    def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:
+    def create(cls: Type[ModelT_co], data: Dict[str, Any]) -> ModelT_co:
         return super().create(data)
 
 
 @dataclass(frozen=True)
 class Media(Entity):
 
-    def _media_info(self) -> StrDict:
+    def _media_info(self) -> Dict[str, Any]:
         items, *_ = client.media_info(self.pk)['items']
-        return cast(StrDict, items)
+        return cast(Dict[str, Any], items)
 
 
 __all__ = [

@@ -1,8 +1,10 @@
 from collections import Counter as RealCounter
 from itertools import chain
 from typing import (
+    Any,
     cast,
     Counter,
+    Dict,
     Iterable,
     List,
     Optional,
@@ -19,7 +21,6 @@ from instapi.models.resource import (
     Resource,
     Resources,
 )
-from instapi.types import StrDict
 from instapi.utils import (
     process_many,
     to_list,
@@ -117,11 +118,11 @@ class User(Entity):
         """
         return cast(int, self.user_detail()['following_count'])
 
-    def user_detail(self) -> StrDict:
-        return cast(StrDict, self.full_info()['user_detail']['user'])
+    def user_detail(self) -> Dict[str, Any]:
+        return cast(Dict[str, Any], self.full_info()['user_detail']['user'])
 
-    def full_info(self) -> StrDict:
-        return cast(StrDict, client.user_detail_info(self.pk))
+    def full_info(self) -> Dict[str, Any]:
+        return cast(Dict[str, Any], client.user_detail_info(self.pk))
 
     def follow(self, user: 'User') -> None:
         """
