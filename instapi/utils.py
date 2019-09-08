@@ -13,6 +13,7 @@ from typing import (
 )
 from uuid import uuid1
 
+
 T = TypeVar('T')
 
 
@@ -59,6 +60,9 @@ def limited(iterable: Iterable[T], limit: Optional[int] = None) -> Iterable[T]:
     if limit is None:
         yield from iterable
     else:
+        if limit < 0:
+            raise ValueError('Limited can\'t handle negative numbers')
+
         yield from (i for _, i in zip(range(limit), iterable))
 
 

@@ -6,7 +6,7 @@ from typing import (
 from pytest import (
     fixture,
     mark,
-)
+    raises)
 
 from instapi.utils import (
     flat,
@@ -67,6 +67,11 @@ class TestLimitedAndToList:
     def test_limit_less(self, arr, func):
         limit = len(arr) // 2
         assert [*func(arr, limit=limit)] == arr[:limit]
+
+    @mark.usefixtures('ret_type')
+    def test_limit_negative(self, arr, func):
+        with raises(ValueError):
+            _ = [*func(arr, limit=-10)]
 
 
 class TestProcessMany:
