@@ -33,7 +33,7 @@ class Feed(Media):
     -   Get media (videos and images) from posts
     """
     like_count: int
-    comment_count: int
+    comment_count: int = 0
 
     @classmethod
     def iter_timeline(cls) -> Iterable['Feed']:
