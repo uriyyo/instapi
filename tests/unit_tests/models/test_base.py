@@ -5,7 +5,6 @@ from pytest import (
 )
 
 from instapi.models.base import BaseModel
-
 from tests.unit_tests.conftest import (
     random_int,
     random_string,
@@ -80,6 +79,9 @@ class TestEntity:
     def test_entity_hash(self, entity):
         # Entity hash should be calculated base on pk field
         assert hash(entity) == hash(entity.pk)
+
+    def test_entity_support_int(self, entity):
+        assert entity.pk == int(entity)
 
 
 class TestMedia:

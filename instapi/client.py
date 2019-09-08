@@ -3,11 +3,12 @@ from typing import (
     Any,
     cast,
     ClassVar,
+    Optional,
 )
 
 from dataclasses import dataclass
-from instagram_private_api import Client as BaseClient
 
+from instapi.client_api import Client
 from instapi.exceptions import ClientNotInitedException
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -15,7 +16,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 @dataclass
 class ClientProxy:
-    obj: BaseClient = None
+    obj: Optional[Client] = None
 
     # Used to return dummy implementation of methods
     is_testing: ClassVar[bool] = False
@@ -30,11 +31,11 @@ class ClientProxy:
         return getattr(self.obj, item)
 
 
-client: BaseClient = cast(BaseClient, ClientProxy())
+client: Client = cast(Client, ClientProxy())
 
 
 def bind(username: str, password: str) -> None:
-    client.obj = BaseClient(username, password)
+    client.obj = Client(username, password)
 
 
 __all__ = [
