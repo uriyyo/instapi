@@ -5,10 +5,12 @@ from instapi.exceptions import (
     ClientNotInitedException,
 )
 from instapi.models import (
-    Comment,
     Candidate,
+    Comment,
+    Direct,
     Feed,
     Image,
+    Message,
     Resource,
     Resources,
     User,
@@ -20,6 +22,7 @@ __all__ = [
     'ClientNotInitedException',
     'Comment',
     'Candidate',
+    'Direct',
     'Feed',
     'Image',
     'Resource',

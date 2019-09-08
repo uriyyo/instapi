@@ -1,4 +1,5 @@
 from functools import partial
+from random import shuffle
 from typing import (
     Iterable,
     List,
@@ -9,6 +10,7 @@ from typing import (
 
 from pytest import fixture
 
+from instapi import Direct
 from instapi.models import (
     Comment,
     Entity,
@@ -16,6 +18,7 @@ from instapi.models import (
     Media,
     User,
 )
+from instapi.models.direct import Message
 from instapi.models.resource import (
     Candidate,
     Image,
@@ -123,6 +126,28 @@ def create_videos(length: int = 10) -> List[Video]:
     return create_resource(resource_cls=Video, extension='.mp4', length=length)
 
 
+def create_directs(length: int = 10) -> List[Direct]:
+    return rands(
+        cls=Direct,
+        length=length,
+        thread_id=random_int,
+        users=lambda: tuple([rand(User)]),
+    )
+
+
+def create_messages(length: int = 10) -> List[Message]:
+    # Messages should not have users with same id
+    # to avoid collision will pop id from predefined
+    # array of ids
+    ids = [*range(length)]
+    shuffle(ids)
+
+    def user():
+        return rand(User, pk=ids.pop())
+
+    return rands(Message, length, placeholder=dict, story_share=dict, user=user)
+
+
 @fixture()
 def user() -> User:
     """Fixture that return dummy user"""
@@ -177,6 +202,26 @@ def candidate() -> Candidate:
 def comment(user) -> Comment:
     """Fixture that return comment with random content"""
     return rand(Comment)
+
+
+@fixture
+def direct(user) -> Direct:
+    return rand(Direct, users=(user,), thread_id=random_int())
+
+
+@fixture
+def message(user) -> Message:
+    return rand(Message, user=user, placeholder={}, story_share={})
+
+
+@fixture
+def messages() -> List[Message]:
+    return create_messages()
+
+
+@fixture
+def directs() -> List[Direct]:
+    return create_directs()
 
 
 @fixture
