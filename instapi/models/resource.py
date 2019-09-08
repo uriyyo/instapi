@@ -1,15 +1,13 @@
 import shutil
 from pathlib import Path
 from typing import (
-    Any,
-    Dict,
+    cast,
     IO,
     Iterable,
     Optional,
     Tuple,
     Type,
     Union,
-    cast,
 )
 from urllib.parse import urlparse
 
@@ -24,6 +22,7 @@ from instapi.models.base import (
     BaseModel,
     ModelT_co,
 )
+from instapi.types import StrDict
 
 
 @dataclass(frozen=True, order=True)
@@ -85,7 +84,7 @@ class Resource(BaseModel):
             raise ValueError("Candidates can't be empty")
 
     @classmethod
-    def create(cls: Type[ModelT_co], data: Iterable[Dict[str, Any]]) -> ModelT_co:
+    def create(cls: Type[ModelT_co], data: Iterable[StrDict]) -> ModelT_co:
         """
         Create Resource from iterable of candidates
 
@@ -124,7 +123,7 @@ class Resource(BaseModel):
     @classmethod
     def create_resources(
             cls,
-            resources_data: Iterable[Dict[str, Any]],
+            resources_data: Iterable[StrDict],
             video: bool = True,
             image: bool = True,
     ) -> Iterable['Resources']:
@@ -144,7 +143,7 @@ class Resource(BaseModel):
                     yield resource
 
     @classmethod
-    def from_data(cls, data: Dict[str, Any]) -> Optional['Resources']:
+    def from_data(cls, data: StrDict) -> Optional['Resources']:
         """
         Create resource based on data fetched from api
 
@@ -159,7 +158,7 @@ class Resource(BaseModel):
             return None
 
     @staticmethod
-    def is_video_data(data: Dict[str, Any]) -> bool:
+    def is_video_data(data: StrDict) -> bool:
         """
         Check if given data contains information about video resource
 
@@ -169,7 +168,7 @@ class Resource(BaseModel):
         return 'video_versions' in data
 
     @staticmethod
-    def is_image_data(data: Dict[str, Any]) -> bool:
+    def is_image_data(data: StrDict) -> bool:
         """
         Check if given data contains information about image resource
 
@@ -185,7 +184,7 @@ class Video(Resource):
     This class represents video resource
     """
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> StrDict:
         return {
             'video_versions': [c.as_dict() for c in self.candidates]
         }
@@ -197,7 +196,7 @@ class Image(Resource):
     This class represents image resource
     """
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> StrDict:
         return {
             'image_versions2': {
                 'candidates': [c.as_dict() for c in self.candidates]

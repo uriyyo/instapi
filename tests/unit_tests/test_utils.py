@@ -13,6 +13,7 @@ from instapi.utils import (
     limited,
     process_many,
     to_list,
+    join,
 )
 from .conftest import random_int
 
@@ -111,3 +112,15 @@ class TestProcessMany:
         mock = mocker.Mock(side_effect=max_ids)
 
         assert [*process_many(mock)] == max_ids
+
+
+class TestJoin:
+
+    def test_join_not_str(self):
+        assert join(range(4)) == '0,1,2,3'
+
+    def test_join_str(self):
+        assert join(['hello', 'world'], 'hello,world')
+
+    def test_custom_separator(self):
+        assert join(['hello', 'world'], ' ') == 'hello world'

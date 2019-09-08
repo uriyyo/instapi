@@ -1,6 +1,6 @@
 from instapi.models.resource import (
-    Image,
     Candidate,
+    Image,
     Resource,
     Resources,
     Video,
@@ -13,6 +13,10 @@ from .base import (
 from .comment import (
     Comment,
 )
+from .direct import (
+    Direct,
+    Message,
+)
 from .feed import (
     Feed,
 )
@@ -22,9 +26,11 @@ from .user import (
 
 __all__ = [
     'BaseModel',
+    'Direct',
     'Entity',
     'Media',
     'Feed',
+    'Message',
     'Comment',
     'Candidate',
     'Resource',
