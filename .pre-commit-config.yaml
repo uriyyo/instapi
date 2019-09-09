@@ -20,3 +20,21 @@ repos:
         always_run: true
         pass_filenames: false
         stages: [push, commit]
+
+      - id: flake8
+        name: Check flake8 rules match
+        entry: flake8 instapi
+        language: system
+        types: [python]
+        always_run: true
+        pass_filenames: false
+        stages: [push, commit]
+
+      - id: isort
+        name: Run isort to set correct order of imports
+        entry: flake8 instapi
+        language: system
+        types: [python]
+        always_run: true
+        pass_filenames: false
+        stages: [push, commit]

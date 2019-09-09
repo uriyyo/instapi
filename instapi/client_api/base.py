@@ -1,8 +1,6 @@
-from typing import (
-    Any,
-    cast,
-    Dict,
-)
+from typing import Any
+from typing import Dict
+from typing import cast
 
 from instagram_private_api import Client
 

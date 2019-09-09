@@ -13,8 +13,16 @@ test_requirements = [
     'pytest==5.1.2',
     'pytest-mock==1.10.4',
     'pytest-cov==2.7.1',
-    'mypy==0.720',
     'pre-commit==1.18.3 ',
+]
+
+lint_requirements = [
+    'mypy==0.720',
+    'isort==4.3',
+    'flake8==3.7.8',
+    'flake8-isort==2.7.0',
+    'flake8-docstrings==1.4',
+    'flake8-bugbear==19.8',
 ]
 
 setup(
@@ -36,9 +44,11 @@ setup(
         'requests==2.22.0',
     ],
     extras_require={
-        'testing': test_requirements,
+        'test': test_requirements,
+        'lint': lint_requirements,
         'dev': [
             *test_requirements,
+            *lint_requirements,
             'pre-commit==1.18.3 ',
         ]
     },

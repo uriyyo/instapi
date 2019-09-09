@@ -1,10 +1,8 @@
 import ssl
-from typing import (
-    Any,
-    cast,
-    ClassVar,
-    Optional,
-)
+from typing import Any
+from typing import ClassVar
+from typing import Optional
+from typing import cast
 
 from dataclasses import dataclass
 

@@ -1,17 +1,13 @@
-from typing import (
-    cast,
-    Iterable,
-    Union,
-)
+from typing import Iterable
+from typing import Union
+from typing import cast
 
 import requests
 from instagram_private_api.errors import ClientError
 
 from instapi.client_api.base import BaseClient
-from instapi.types import (
-    StrDict,
-    SupportsInt_co,
-)
+from instapi.types import StrDict
+from instapi.types import SupportsInt_co
 from instapi.utils import join
 
 RecipientUsers = Union[SupportsInt_co, Iterable[SupportsInt_co]]
