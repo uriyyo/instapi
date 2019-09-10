@@ -1,18 +1,13 @@
-from functools import (
-    partial,
-)
+from functools import partial
 from itertools import chain
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    TypeVar,
-)
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import TypeVar
 from uuid import uuid1
-
 
 T = TypeVar('T')
 

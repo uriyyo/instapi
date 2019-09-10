@@ -1,27 +1,21 @@
 import shutil
 from pathlib import Path
-from typing import (
-    cast,
-    IO,
-    Iterable,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import IO
+from typing import Iterable
+from typing import Optional
+from typing import Tuple
+from typing import Type
+from typing import Union
+from typing import cast
 from urllib.parse import urlparse
 
 import requests
-from dataclasses import (
-    dataclass,
-    field,
-)
+from dataclasses import dataclass
+from dataclasses import field
 from PIL import Image as PILImage
 
-from instapi.models.base import (
-    BaseModel,
-    ModelT_co,
-)
+from instapi.models.base import BaseModel
+from instapi.models.base import ModelT_co
 from instapi.types import StrDict
 
 

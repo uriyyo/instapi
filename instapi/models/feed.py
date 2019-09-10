@@ -1,26 +1,20 @@
-from typing import (
-    cast,
-    Iterable,
-    List,
-    Optional,
-)
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import cast
 
 from dataclasses import dataclass
 
 from instapi.client import client
 from instapi.models.base import Media
 from instapi.models.comment import Comment
-from instapi.models.resource import (
-    Image,
-    Resources,
-    Video,
-    Resource,
-)
+from instapi.models.resource import Image
+from instapi.models.resource import Resource
+from instapi.models.resource import Resources
+from instapi.models.resource import Video
 from instapi.models.user import User
-from instapi.utils import (
-    process_many,
-    to_list,
-)
+from instapi.utils import process_many
+from instapi.utils import to_list
 
 
 @dataclass(frozen=True)

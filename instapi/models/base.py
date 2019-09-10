@@ -1,21 +1,17 @@
 from functools import lru_cache
-from typing import (
-    AbstractSet,
-    Any,
-    cast,
-    ClassVar,
-    Dict,
-    SupportsInt,
-    Type,
-    TypeVar,
-)
+from typing import AbstractSet
+from typing import Any
+from typing import ClassVar
+from typing import Dict
+from typing import SupportsInt
+from typing import Type
+from typing import TypeVar
+from typing import cast
 
-from dataclasses import (
-    asdict,
-    dataclass,
-    field,
-    Field,
-)
+from dataclasses import Field
+from dataclasses import asdict
+from dataclasses import dataclass
+from dataclasses import field
 
 from instapi.client import client
 from instapi.types import StrDict

@@ -1,7 +1,7 @@
 language: python
 
 install:
-  - pip install ".[testing]"
+  - pip install ".[dev]"
 
 env:
   - TEST_CMD="pytest tests"
@@ -11,6 +11,11 @@ script:
 
 matrix:
   include:
+    - name: "flake8"
+      python: 3.6
+      env:
+        - TEST_CMD="flake8 instapi"
+
     - name: "mypy"
       python: "3.6"
       env:

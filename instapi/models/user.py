@@ -1,29 +1,21 @@
 from collections import Counter as RealCounter
 from itertools import chain
-from typing import (
-    cast,
-    Counter,
-    Iterable,
-    List,
-    Optional,
-    TYPE_CHECKING,
-)
+from typing import TYPE_CHECKING
+from typing import Counter
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import cast
 
-from dataclasses import (
-    dataclass,
-)
+from dataclasses import dataclass
 
 from instapi.client import client
 from instapi.models.base import Entity
-from instapi.models.resource import (
-    Resource,
-    Resources,
-)
+from instapi.models.resource import Resource
+from instapi.models.resource import Resources
 from instapi.types import StrDict
-from instapi.utils import (
-    process_many,
-    to_list,
-)
+from instapi.utils import process_many
+from instapi.utils import to_list
 
 if TYPE_CHECKING:
     from instapi.models.feed import Feed  # pragma: no cover

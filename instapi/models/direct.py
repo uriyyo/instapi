@@ -1,30 +1,22 @@
-from typing import (
-    Any,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Type,
-)
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Type
 
-from dataclasses import (
-    dataclass,
-    field,
-)
+from dataclasses import dataclass
+from dataclasses import field
 
 from instapi.client import client
-from instapi.models.base import (
-    BaseModel,
-    Media,
-    ModelT_co,
-)
+from instapi.models.base import BaseModel
+from instapi.models.base import Media
+from instapi.models.base import ModelT_co
 from instapi.models.user import User
 from instapi.types import StrDict
-from instapi.utils import (
-    process_many,
-    to_list,
-)
+from instapi.utils import process_many
+from instapi.utils import to_list
 
 
 @dataclass(frozen=True)
