@@ -1,3 +1,5 @@
+import os
+
 from instagram_private_api import Client
 from pytest import (
     mark,
@@ -32,3 +34,9 @@ def test_client_inited_after_bind(mocker):
     # Check that proxy inited
     assert client.obj is not None
     Client.__init__.assert_called_once_with(username, password)
+
+
+@mark.usefixtures('regular_client_mode')
+def test_bind_with_no_arguments():
+    with raises(ValueError):
+        bind()

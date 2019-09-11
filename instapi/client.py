@@ -1,4 +1,5 @@
 import ssl
+import os
 from typing import Any
 from typing import ClassVar
 from typing import Optional
@@ -10,6 +11,9 @@ from instapi.client_api import Client
 from instapi.exceptions import ClientNotInitedException
 
 ssl._create_default_https_context = ssl._create_unverified_context
+
+ENV_USERNAME = os.environ.get('INSTAPI_USERNAME')
+ENV_PASSWORD = os.environ.get('INSTAPI_PASSWORD')
 
 
 @dataclass
@@ -32,7 +36,13 @@ class ClientProxy:
 client: Client = cast(Client, ClientProxy())
 
 
-def bind(username: str, password: str) -> None:
+def bind(
+        username: Optional[str] = ENV_USERNAME,
+        password: Optional[str] = ENV_PASSWORD,
+) -> None:
+    if username is None or password is None:
+        raise ValueError("Both username and password should be passed")
+
     client.obj = Client(username, password)
 
 
