@@ -1,5 +1,5 @@
-import ssl
 import os
+import ssl
 from typing import Any
 from typing import ClassVar
 from typing import Optional
@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from instapi.client_api import Client
 from instapi.exceptions import ClientNotInitedException
+from instapi.utils import LoggingMeta
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -17,7 +18,7 @@ ENV_PASSWORD = os.environ.get('INSTAPI_PASSWORD')
 
 
 @dataclass
-class ClientProxy:
+class ClientProxy(metaclass=LoggingMeta):
     obj: Optional[Client] = None
 
     # Used to return dummy implementation of methods
