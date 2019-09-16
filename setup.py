@@ -42,6 +42,7 @@ setup(
         'instagram-private-api==1.6.0.0',
         'Pillow==6.1.0',
         'requests==2.22.0',
+        'autologging==1.3.2',
     ],
     extras_require={
         'test': test_requirements,

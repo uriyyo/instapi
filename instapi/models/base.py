@@ -1,9 +1,7 @@
-from functools import lru_cache
 from typing import AbstractSet
 from typing import Any
 from typing import ClassVar
 from typing import Dict
-from typing import SupportsInt
 from typing import Type
 from typing import TypeVar
 from typing import cast
@@ -15,16 +13,16 @@ from dataclasses import field
 
 from instapi.client import client
 from instapi.types import StrDict
+from instapi.utils import LoggingMeta
 
 ModelT_co = TypeVar('ModelT_co', bound='BaseModel', covariant=True)
 
 
 @dataclass(frozen=True)
-class BaseModel:
+class BaseModel(metaclass=LoggingMeta):
     __dataclass_fields__: ClassVar[Dict[str, Field]]
 
     @classmethod
-    @lru_cache()
     def fields(cls) -> AbstractSet[str]:
         return cls.__dataclass_fields__.keys() - {'__dataclass_fields__'}
 
@@ -48,7 +46,7 @@ class BaseModel:
 
 
 @dataclass(frozen=True)
-class Entity(BaseModel, SupportsInt):
+class Entity(BaseModel):
     pk: int = field(repr=False)
 
     def __hash__(self) -> int:

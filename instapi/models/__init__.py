@@ -1,28 +1,17 @@
-from instapi.models.resource import (
-    Candidate,
-    Image,
-    Resource,
-    Resources,
-    Video,
-)
-from .base import (
-    BaseModel,
-    Entity,
-    Media,
-)
-from .comment import (
-    Comment,
-)
-from .direct import (
-    Direct,
-    Message,
-)
-from .feed import (
-    Feed,
-)
-from .user import (
-    User,
-)
+from instapi.models.resource import Candidate
+from instapi.models.resource import Image
+from instapi.models.resource import Resource
+from instapi.models.resource import Resources
+from instapi.models.resource import Video
+
+from .base import BaseModel
+from .base import Entity
+from .base import Media
+from .comment import Comment
+from .direct import Direct
+from .direct import Message
+from .feed import Feed
+from .user import User
 
 __all__ = [
     'BaseModel',
