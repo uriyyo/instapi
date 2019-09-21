@@ -52,6 +52,19 @@ class Feed(Media):
         """
         return to_list(cls.iter_timeline(), limit=limit)
 
+    def user_tags(self) -> List['User']:
+        """
+        Generate list of Users from Feed usertags
+
+        :return: list of Users from usertags
+        """
+        info = self._media_info()
+
+        if 'usertags' not in info:
+            return []
+
+        return [User.create(u['user']) for u in info['usertags']['in']]
+
     def iter_likes(self) -> Iterable['User']:
         """
         Create generator for iteration over posts from feed
@@ -127,7 +140,6 @@ class Feed(Media):
         :param image: true - add images, false - ignore images
         :return: generator with images/videos
         """
-        # TODO: implement ability to fetch media with different quality
         media_info = self._media_info()
         carousel_media = media_info.get('carousel_media', [media_info])
 

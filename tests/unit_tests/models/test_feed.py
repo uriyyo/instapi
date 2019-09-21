@@ -41,6 +41,27 @@ class TestFeed:
             return_value=videos[0].as_dict(),
         )
 
+    def test_usertags_one_user(self, mocker, feed, user):
+        mocker.patch(
+            'instapi.models.feed.Feed._media_info',
+            return_value={'usertags': {'in': [{'user': user.as_dict()}]}},
+        )
+
+        assert feed.user_tags() == [user]
+
+    def test_usertags_many_users(self, mocker, feed, users):
+        mocker.patch(
+            'instapi.models.feed.Feed._media_info',
+            return_value={'usertags': {'in': [{'user': u} for u in as_dicts(users)]}},
+        )
+
+        assert feed.user_tags() == users
+
+    def test_usertags_no_users(self, mocker, feed):
+        mocker.patch('instapi.models.feed.Feed._media_info', return_value={})
+
+        assert not feed.user_tags()
+
     def test_like(self, mocker, feed):
         like_mock = mocker.patch('instapi.client.client.post_like')
 
