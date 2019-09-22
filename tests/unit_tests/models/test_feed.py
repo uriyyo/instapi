@@ -27,20 +27,6 @@ class TestFeed:
             return_value={'feed_items': [{'media_or_ad': f.as_dict()} for f in feeds]},
         )
 
-    @fixture
-    def mock_images(self, mocker, images):
-        return mocker.patch(
-            'instapi.models.base.Media._media_info',
-            return_value=images[0].as_dict(),
-        )
-
-    @fixture
-    def mock_videos(self, mocker, videos):
-        return mocker.patch(
-            'instapi.models.base.Media._media_info',
-            return_value=videos[0].as_dict(),
-        )
-
     def test_usertags_one_user(self, mocker, feed, user):
         mocker.patch(
             'instapi.models.feed.Feed._media_info',
@@ -125,32 +111,3 @@ class TestFeed:
 
         assert feeds == feeds[:limit]
 
-    def test_iter_resources_videos_without_carusel(self, mock_videos, videos, feed):
-        assert [*feed.iter_resources()] == videos
-
-    def test_iter_resources_images_without_carusel(self, mock_images, images, feed):
-        assert [*feed.iter_resources()] == images
-
-    def test_resources_videos(self, mock_videos, videos, feed):
-        assert feed.resources() == videos
-
-    def test_resources_images(self, mock_images, images, feed):
-        assert feed.resources() == images
-
-    def test_iter_videos(self, mock_videos, videos, feed):
-        assert [*feed.iter_videos()] == videos
-
-    def test_videos(self, mock_videos, videos, feed):
-        assert feed.videos() == videos
-
-    def test_iter_images(self, mock_images, images, feed):
-        assert [*feed.iter_images()] == images
-
-    def test_images(self, mock_images, images, feed):
-        assert feed.images() == images
-
-    def test_video(self, mock_videos, videos, feed):
-        assert feed.video() == videos[0]
-
-    def test_image(self, mock_images, images, feed):
-        assert feed.image() == images[0]

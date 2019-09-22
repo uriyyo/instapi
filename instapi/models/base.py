@@ -4,14 +4,12 @@ from typing import ClassVar
 from typing import Dict
 from typing import Type
 from typing import TypeVar
-from typing import cast
 
 from dataclasses import Field
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 
-from instapi.client import client
 from instapi.types import StrDict
 from instapi.utils import LoggingMeta
 
@@ -60,17 +58,8 @@ class Entity(BaseModel):
         return super().create(data)
 
 
-@dataclass(frozen=True)
-class Media(Entity):
-
-    def _media_info(self) -> StrDict:
-        items, *_ = client.media_info(self.pk)['items']
-        return cast(StrDict, items)
-
-
 __all__ = [
     'BaseModel',
     'Entity',
-    'Media',
     'ModelT_co',
 ]

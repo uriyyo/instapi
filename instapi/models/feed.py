@@ -1,24 +1,20 @@
 from typing import Iterable
 from typing import List
 from typing import Optional
-from typing import cast
 
 from dataclasses import dataclass
 
 from instapi.client import client
-from instapi.models.base import Media
 from instapi.models.comment import Comment
-from instapi.models.resource import Image
-from instapi.models.resource import Resource
-from instapi.models.resource import Resources
-from instapi.models.resource import Video
+from instapi.models.resource import ResourceContainer
 from instapi.models.user import User
+from instapi.types import StrDict
 from instapi.utils import process_many
 from instapi.utils import to_list
 
 
 @dataclass(frozen=True)
-class Feed(Media):
+class Feed(ResourceContainer):
     """
     This class represent Instagram's feed. It gives opportunity to:
     -   Get posts from feed
@@ -51,6 +47,15 @@ class Feed(Media):
         :return: list with posts from feed
         """
         return to_list(cls.iter_timeline(), limit=limit)
+
+    def _resources(self) -> Iterable['StrDict']:
+        """
+        Feed can contain multiple images and videos that located in carousel_media
+
+        :return: source of videos or images
+        """
+        media_info = self._media_info()
+        return media_info.get('carousel_media', [media_info])
 
     def user_tags(self) -> List['User']:
         """
@@ -131,80 +136,6 @@ class Feed(Media):
         :return: list with comments
         """
         return to_list(self.iter_comments(), limit=limit)
-
-    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable[Resources]:
-        """
-        Create generator for iteration over images/videos, which contains in the post
-
-        :param video: true - add videos, false - ignore videos
-        :param image: true - add images, false - ignore images
-        :return: generator with images/videos
-        """
-        media_info = self._media_info()
-        carousel_media = media_info.get('carousel_media', [media_info])
-
-        return Resource.create_resources(carousel_media, video=video, image=image)
-
-    def resources(self, video: bool = True, image: bool = True, limit: Optional[int] = None) -> List[Resources]:
-        """
-        Generate list of images/videos, which contains in the post
-
-        :param video: true - add videos, false - ignore videos
-        :param image: true - add images, false - ignore images
-        :param limit: number of images/videos, which will be added to the list
-        :return: list with images/videos
-        """
-        return to_list(self.iter_resources(video=video, image=image), limit=limit)
-
-    def iter_videos(self) -> Iterable['Video']:
-        """
-        Create generator for iteration over videos, which contains in the post
-
-        :return: generator with videos, which contains in the post
-        """
-        return cast(Iterable['Video'], self.iter_resources(video=True, image=False))
-
-    def videos(self, limit: Optional[int] = None) -> List['Video']:
-        """
-        Generate list of videos, which contains in the post
-
-        :param limit: number of videos, which will be added to the list
-        :return: list with videos
-        """
-        return to_list(self.iter_videos(), limit=limit)
-
-    def iter_images(self) -> Iterable['Image']:
-        """
-        Create generator for iteration over images, which contains in the post
-
-        :return: generator with images, which contains in the post
-        """
-        return cast(Iterable['Image'], self.iter_resources(video=False, image=True))
-
-    def images(self, limit: Optional[int] = None) -> List['Image']:
-        """
-        Generate list of images, which contains in the post
-
-        :param limit: number of images, which will be added to the list
-        :return: list with images
-        """
-        return to_list(self.iter_images(), limit=limit)
-
-    def image(self) -> Optional['Image']:
-        """
-        Return the first image from feed if it exists.
-
-        :return: image or None
-        """
-        return next(iter(self.iter_images()), None)
-
-    def video(self) -> Optional['Video']:
-        """
-        Return the first video from feed if it exists
-
-        :return: video or None
-        """
-        return next(iter(self.iter_videos()), None)
 
 
 __all__ = [

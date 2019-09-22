@@ -12,13 +12,13 @@ from dataclasses import dataclass
 from instapi.client import client
 from instapi.models.base import Entity
 from instapi.models.resource import Resource
-from instapi.models.resource import Resources
 from instapi.types import StrDict
 from instapi.utils import process_many
 from instapi.utils import to_list
 
 if TYPE_CHECKING:
     from instapi.models.feed import Feed  # pragma: no cover
+    from instapi.models.story import Story  # pragma: no cover
 
 
 @dataclass(frozen=True)
@@ -211,11 +211,12 @@ class User(Entity):
     def liked_by_user(self, user: 'User', limit: Optional[int] = None) -> List['Feed']:
         return to_list(self.iter_liked_by_user(user), limit=limit)
 
-    def iter_stories(self) -> Iterable['Resources']:
+    def iter_stories(self) -> Iterable['Story']:
+        from instapi.models.story import Story
         items = (client.user_story_feed(self.pk)['reel'] or {}).get('items', ())
-        return Resource.create_resources(items)
+        yield from map(Story.create, items)
 
-    def stories(self, limit: Optional[int] = None) -> List['Resources']:
+    def stories(self, limit: Optional[int] = None) -> List['Story']:
         return to_list(self.iter_stories(), limit=limit)
 
 

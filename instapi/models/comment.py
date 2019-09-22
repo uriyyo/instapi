@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from dataclasses import dataclass
 
 from instapi.client import client
-from instapi.models.base import Media
+from instapi.models.media import Media
 
 if TYPE_CHECKING:
     from instapi.models import User  # pragma: no cover

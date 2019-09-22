@@ -22,7 +22,7 @@ class DirectEndpoint(BaseClient):
         try:
             value = join(map(int, cast(Iterable, recipient_users)))
         except TypeError:
-            value = str(recipient_users)
+            value = str(int(cast(str, recipient_users)))
 
         return f'{"[" * braces_count}{value}{"]" * braces_count}'
 
