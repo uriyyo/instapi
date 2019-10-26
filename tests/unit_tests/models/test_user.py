@@ -342,32 +342,28 @@ def test_liked_by(mocker, mock_feeds, feeds, user, users):
         assert_method(u, [])
 
 
-def test_stories(user, mocker, images, videos):
+def test_stories(user, mocker, stories):
     """
     Test for:
     User.iter_stories
     User.stories
     """
-    expected = [*videos, *images]
 
-    return_value = {'reel': {'items': flat([
-        as_dicts(videos),
-        as_dicts(images),
-    ])}}
+    return_value = {'reel': {'items': as_dicts(stories)}}
 
     story_mock = mocker.patch('instapi.client.client.user_story_feed', return_value=return_value)
 
-    assert [*user.iter_stories()] == expected
+    assert [*user.iter_stories()] == stories
     story_mock.assert_called_once_with(user.pk)
 
     story_mock.reset_mock()
 
-    assert user.stories() == expected
+    assert user.stories() == stories
     story_mock.assert_called_once_with(user.pk)
 
     story_mock.reset_mock()
 
-    limit = len(expected) - len(expected) // 2
+    limit = len(stories) - len(stories) // 2
 
-    assert user.stories(limit=limit) == expected[:limit]
+    assert user.stories(limit=limit) == stories[:limit]
     story_mock.assert_called_once_with(user.pk)

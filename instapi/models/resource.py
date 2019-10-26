@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 from typing import IO
 from typing import Iterable
+from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
@@ -16,7 +17,9 @@ from PIL import Image as PILImage
 
 from instapi.models.base import BaseModel
 from instapi.models.base import ModelT_co
+from instapi.models.media import Media
 from instapi.types import StrDict
+from instapi.utils import to_list
 
 
 @dataclass(frozen=True, order=True)
@@ -210,12 +213,98 @@ class Image(Resource):
         img.show()
 
 
+class ResourceContainer(Media):
+    """
+    The class represents media with resources
+    """
+
+    def _resources(self) -> Iterable['StrDict']:
+        """
+        Return source of videos or images
+
+        :return: source of videos or images
+        """
+        return [self._media_info()]
+
+    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable['Resources']:
+        """
+        Create generator for iteration over images/videos, which contains in the media
+
+        :param video: true - add videos, false - ignore videos
+        :param image: true - add images, false - ignore images
+        :return: generator with images/videos
+        """
+        return Resource.create_resources(self._resources(), video=video, image=image)
+
+    def resources(self, video: bool = True, image: bool = True, limit: Optional[int] = None) -> List['Resources']:
+        """
+        Generate list of images/videos, which contains in the media
+
+        :param video: true - add videos, false - ignore videos
+        :param image: true - add images, false - ignore images
+        :param limit: number of images/videos, which will be added to the list
+        :return: list with images/videos
+        """
+        return to_list(self.iter_resources(video=video, image=image), limit=limit)
+
+    def iter_videos(self) -> Iterable['Video']:
+        """
+        Create generator for iteration over videos, which contains in the media
+
+        :return: generator with videos, which contains in the post
+        """
+        return cast(Iterable['Video'], self.iter_resources(video=True, image=False))
+
+    def videos(self, limit: Optional[int] = None) -> List['Video']:
+        """
+        Generate list of videos, which contains in the media
+
+        :param limit: number of videos, which will be added to the list
+        :return: list with videos
+        """
+        return to_list(self.iter_videos(), limit=limit)
+
+    def iter_images(self) -> Iterable['Image']:
+        """
+        Create generator for iteration over images, which contains in the media
+
+        :return: generator with images, which contains in the meia
+        """
+        return cast(Iterable['Image'], self.iter_resources(video=False, image=True))
+
+    def images(self, limit: Optional[int] = None) -> List['Image']:
+        """
+        Generate list of images, which contains in the media
+
+        :param limit: number of images, which will be added to the list
+        :return: list with images
+        """
+        return to_list(self.iter_images(), limit=limit)
+
+    def image(self) -> Optional['Image']:
+        """
+        Return the first image from media if it exists.
+
+        :return: image or None
+        """
+        return next(iter(self.iter_images()), None)
+
+    def video(self) -> Optional['Video']:
+        """
+        Return the first video from media if it exists
+
+        :return: video or None
+        """
+        return next(iter(self.iter_videos()), None)
+
+
 Resources = Union[Image, Video]
 
 __all__ = [
     'Candidate',
     'Resource',
     'Resources',
+    'ResourceContainer',
     'Video',
     'Image',
 ]

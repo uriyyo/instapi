@@ -11,8 +11,8 @@ from dataclasses import field
 
 from instapi.client import client
 from instapi.models.base import BaseModel
-from instapi.models.base import Media
 from instapi.models.base import ModelT_co
+from instapi.models.media import Media
 from instapi.models.user import User
 from instapi.types import StrDict
 from instapi.utils import process_many

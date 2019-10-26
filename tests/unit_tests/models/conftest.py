@@ -24,7 +24,9 @@ from instapi.models.resource import (
     Image,
     Resource,
     Video,
+    ResourceContainer,
 )
+from instapi.models.story import Story
 from ..conftest import (
     rand,
     random_int,
@@ -148,6 +150,10 @@ def create_messages(length: int = 10) -> List[Message]:
     return rands(Message, length, placeholder=dict, story_share=dict, user=user)
 
 
+def create_stories(length: int = 10) -> List[Story]:
+    return rands(Story, length=length, mentions=list)
+
+
 @fixture()
 def user() -> User:
     """Fixture that return dummy user"""
@@ -204,6 +210,16 @@ def comment(user) -> Comment:
     return rand(Comment)
 
 
+@fixture()
+def story() -> Story:
+    return rand(Story, mentions=[])
+
+
+@fixture()
+def resource_container() -> ResourceContainer:
+    return rand(ResourceContainer)
+
+
 @fixture
 def direct(user) -> Direct:
     return rand(Direct, users=(user,), thread_id=random_int())
@@ -247,3 +263,8 @@ def videos():
 @fixture
 def images():
     return create_images(length=1)
+
+
+@fixture
+def stories():
+    return rands(Story, mentions=list)
