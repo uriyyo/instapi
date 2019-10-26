@@ -40,7 +40,7 @@ setup(
     install_requires=[
         'dataclasses==0.6.0',
         'instagram-private-api==1.6.0.0',
-        'Pillow==6.1.0',
+        'pillow>=6.2.0',
         'requests==2.22.0',
         'autologging==1.3.2',
     ],
