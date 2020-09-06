@@ -1,5 +1,3 @@
-import os
-
 from instagram_private_api import Client
 from pytest import (
     mark,
@@ -26,6 +24,9 @@ def test_client_not_initialized():
 def test_client_inited_after_bind(mocker):
     """Test for: bind function was called"""
     mocker.patch('instagram_private_api.client.Client.__init__', return_value=None)
+    cookie_jar_mock = mocker.patch('instagram_private_api.client.Client.cookie_jar')
+    get_from_cache_mock = mocker.patch('instapi.cache.get_from_cache', return_value=None)
+    write_to_cache_mock = mocker.patch('instapi.cache.write_to_cache', return_value=None)
 
     username, password = random_string(), random_string()
 
@@ -33,7 +34,10 @@ def test_client_inited_after_bind(mocker):
 
     # Check that proxy inited
     assert client.obj is not None
-    Client.__init__.assert_called_once_with(username, password)
+    Client.__init__.assert_called_once_with(username, password, cookie=None)
+
+    get_from_cache_mock.assert_called_once_with((username, password))
+    write_to_cache_mock.assert_called_once_with((username, password), cookie_jar_mock)
 
 
 @mark.usefixtures('regular_client_mode')
