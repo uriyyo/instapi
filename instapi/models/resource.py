@@ -1,25 +1,16 @@
 import shutil
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import IO
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
-from typing import cast
+from typing import IO, Iterable, List, Optional, Tuple, Type, Union, cast
 from urllib.parse import urlparse
 
 import requests
-from dataclasses import dataclass
-from dataclasses import field
 from PIL import Image as PILImage
 
-from instapi.models.base import BaseModel
-from instapi.models.base import ModelT_co
-from instapi.models.media import Media
-from instapi.types import StrDict
-from instapi.utils import to_list
+from ..types import StrDict
+from ..utils import to_list
+from .base import BaseModel, ModelT_co
+from .media import Media
 
 
 @dataclass(frozen=True, order=True)
@@ -27,6 +18,7 @@ class Candidate(BaseModel):
     """
     Represent a candidate for Resource
     """
+
     width: int
     height: int
     url: str = field(compare=False)
@@ -38,7 +30,7 @@ class Candidate(BaseModel):
 
         :return: path to file
         """
-        *_, filename = urlparse(self.url).path.split('/')
+        *_, filename = urlparse(self.url).path.split("/")
         return Path(filename)
 
     def content(self) -> IO[bytes]:
@@ -65,8 +57,8 @@ class Candidate(BaseModel):
         else:
             into = Path(filename)
 
-        with into.open(mode='wb') as f:
-            shutil.copyfileobj(self.content(), f)
+        with into.open(mode="wb") as f:
+            shutil.copyfileobj(self.content(), f)  # type: ignore
 
 
 @dataclass(frozen=True)
@@ -74,6 +66,7 @@ class Resource(BaseModel):
     """
     This class represents image or video, which contains in the post
     """
+
     candidates: Tuple[Candidate]
 
     def __post_init__(self) -> None:
@@ -101,10 +94,10 @@ class Resource(BaseModel):
         return max(self.candidates)
 
     def download(
-            self,
-            directory: Path = None,
-            filename: Union[Path, str] = None,
-            candidate: Candidate = None,
+        self,
+        directory: Path = None,
+        filename: Union[Path, str] = None,
+        candidate: Candidate = None,
     ) -> None:
         """
         Download image/video
@@ -119,11 +112,11 @@ class Resource(BaseModel):
 
     @classmethod
     def create_resources(
-            cls,
-            resources_data: Iterable[StrDict],
-            video: bool = True,
-            image: bool = True,
-    ) -> Iterable['Resources']:
+        cls,
+        resources_data: Iterable[StrDict],
+        video: bool = True,
+        image: bool = True,
+    ) -> Iterable["Resources"]:
         """
         Create a generator for iteration over images/videos, which contains in the resources_data
 
@@ -140,7 +133,7 @@ class Resource(BaseModel):
                     yield resource
 
     @classmethod
-    def from_data(cls, data: StrDict) -> Optional['Resources']:
+    def from_data(cls, data: StrDict) -> Optional["Resources"]:
         """
         Create resource based on data fetched from api
 
@@ -148,9 +141,9 @@ class Resource(BaseModel):
         :return: resource instance or None
         """
         if cls.is_video_data(data):
-            return Video.create(data['video_versions'])
+            return Video.create(data["video_versions"])
         elif cls.is_image_data(data):
-            return Image.create(data['image_versions2']['candidates'])
+            return Image.create(data["image_versions2"]["candidates"])
         else:
             return None
 
@@ -162,7 +155,7 @@ class Resource(BaseModel):
         :param data: resource data
         :return: is given data contains information about video resource
         """
-        return 'video_versions' in data
+        return "video_versions" in data
 
     @staticmethod
     def is_image_data(data: StrDict) -> bool:
@@ -172,7 +165,7 @@ class Resource(BaseModel):
         :param data: resource data
         :return: is given data contains information about image resource
         """
-        return 'video_versions' not in data and 'image_versions2' in data
+        return "video_versions" not in data and "image_versions2" in data
 
 
 @dataclass(frozen=True)
@@ -182,9 +175,7 @@ class Video(Resource):
     """
 
     def as_dict(self) -> StrDict:
-        return {
-            'video_versions': [c.as_dict() for c in self.candidates]
-        }
+        return {"video_versions": [c.as_dict() for c in self.candidates]}
 
 
 @dataclass(frozen=True)
@@ -194,11 +185,7 @@ class Image(Resource):
     """
 
     def as_dict(self) -> StrDict:
-        return {
-            'image_versions2': {
-                'candidates': [c.as_dict() for c in self.candidates]
-            }
-        }
+        return {"image_versions2": {"candidates": [c.as_dict() for c in self.candidates]}}
 
     def preview(self, candidate: Candidate = None) -> None:
         """
@@ -218,7 +205,7 @@ class ResourceContainer(Media):
     The class represents media with resources
     """
 
-    def _resources(self) -> Iterable['StrDict']:
+    def _resources(self) -> Iterable["StrDict"]:
         """
         Return source of videos or images
 
@@ -226,7 +213,7 @@ class ResourceContainer(Media):
         """
         return [self._media_info()]
 
-    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable['Resources']:
+    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable["Resources"]:
         """
         Create generator for iteration over images/videos, which contains in the media
 
@@ -236,7 +223,9 @@ class ResourceContainer(Media):
         """
         return Resource.create_resources(self._resources(), video=video, image=image)
 
-    def resources(self, video: bool = True, image: bool = True, limit: Optional[int] = None) -> List['Resources']:
+    def resources(
+        self, video: bool = True, image: bool = True, limit: Optional[int] = None
+    ) -> List["Resources"]:
         """
         Generate list of images/videos, which contains in the media
 
@@ -247,15 +236,15 @@ class ResourceContainer(Media):
         """
         return to_list(self.iter_resources(video=video, image=image), limit=limit)
 
-    def iter_videos(self) -> Iterable['Video']:
+    def iter_videos(self) -> Iterable["Video"]:
         """
         Create generator for iteration over videos, which contains in the media
 
         :return: generator with videos, which contains in the post
         """
-        return cast(Iterable['Video'], self.iter_resources(video=True, image=False))
+        return cast(Iterable["Video"], self.iter_resources(video=True, image=False))
 
-    def videos(self, limit: Optional[int] = None) -> List['Video']:
+    def videos(self, limit: Optional[int] = None) -> List["Video"]:
         """
         Generate list of videos, which contains in the media
 
@@ -264,15 +253,15 @@ class ResourceContainer(Media):
         """
         return to_list(self.iter_videos(), limit=limit)
 
-    def iter_images(self) -> Iterable['Image']:
+    def iter_images(self) -> Iterable["Image"]:
         """
         Create generator for iteration over images, which contains in the media
 
         :return: generator with images, which contains in the meia
         """
-        return cast(Iterable['Image'], self.iter_resources(video=False, image=True))
+        return cast(Iterable["Image"], self.iter_resources(video=False, image=True))
 
-    def images(self, limit: Optional[int] = None) -> List['Image']:
+    def images(self, limit: Optional[int] = None) -> List["Image"]:
         """
         Generate list of images, which contains in the media
 
@@ -281,7 +270,7 @@ class ResourceContainer(Media):
         """
         return to_list(self.iter_images(), limit=limit)
 
-    def image(self) -> Optional['Image']:
+    def image(self) -> Optional["Image"]:
         """
         Return the first image from media if it exists.
 
@@ -289,7 +278,7 @@ class ResourceContainer(Media):
         """
         return next(iter(self.iter_images()), None)
 
-    def video(self) -> Optional['Video']:
+    def video(self) -> Optional["Video"]:
         """
         Return the first video from media if it exists
 
@@ -301,10 +290,10 @@ class ResourceContainer(Media):
 Resources = Union[Image, Video]
 
 __all__ = [
-    'Candidate',
-    'Resource',
-    'Resources',
-    'ResourceContainer',
-    'Video',
-    'Image',
+    "Candidate",
+    "Resource",
+    "Resources",
+    "ResourceContainer",
+    "Video",
+    "Image",
 ]

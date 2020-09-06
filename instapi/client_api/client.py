@@ -1,4 +1,4 @@
-from instapi.client_api.direct import DirectEndpoint
+from .direct import DirectEndpoint
 
 
 class Client(
@@ -8,5 +8,5 @@ class Client(
 
 
 __all__ = [
-    'Client',
+    "Client",
 ]

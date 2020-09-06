@@ -1,21 +1,19 @@
-from typing import Any
-from typing import Dict
-from typing import cast
+from typing import Any, Dict, cast
 
 from instagram_private_api import Client
 
-from instapi.types import StrDict
+from ..types import StrDict
 
 
 class BaseClient(Client):
     def _call_api(
-            self,
-            endpoint: str,
-            params: Dict[str, Any] = None,
-            query: Dict[str, Any] = None,
-            return_response: bool = False,
-            unsigned: bool = False,
-            version: str = 'v1',
+        self,
+        endpoint: str,
+        params: Dict[str, Any] = None,
+        query: Dict[str, Any] = None,
+        return_response: bool = False,
+        unsigned: bool = False,
+        version: str = "v1",
     ) -> StrDict:
         value = super()._call_api(
             endpoint=endpoint,
@@ -30,5 +28,5 @@ class BaseClient(Client):
 
 
 __all__ = [
-    'BaseClient',
+    "BaseClient",
 ]

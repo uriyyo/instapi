@@ -1,9 +1,8 @@
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from dataclasses import dataclass
-
-from instapi.client import client
-from instapi.models.media import Media
+from ..client import client
+from .media import Media
 
 if TYPE_CHECKING:
     from instapi.models import User  # pragma: no cover
@@ -14,8 +13,9 @@ class Comment(Media):
     """
     This class represents a comment in Instagram
     """
+
     text: str
-    user: 'User'
+    user: "User"
 
     def like(self) -> None:
         """
@@ -35,5 +35,5 @@ class Comment(Media):
 
 
 __all__ = [
-    'Comment',
+    "Comment",
 ]

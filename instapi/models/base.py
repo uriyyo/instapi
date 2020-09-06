@@ -1,33 +1,21 @@
-from typing import AbstractSet
-from typing import Any
-from typing import ClassVar
-from typing import Dict
-from typing import Type
-from typing import TypeVar
+from dataclasses import asdict, dataclass, field, fields
+from typing import AbstractSet, Any, Type, TypeVar, cast
 
-from dataclasses import Field
-from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
+from ..types import StrDict
 
-from instapi.types import StrDict
-from instapi.utils import LoggingMeta
-
-ModelT_co = TypeVar('ModelT_co', bound='BaseModel', covariant=True)
+ModelT_co = TypeVar("ModelT_co", bound="BaseModel", covariant=True)
 
 
 @dataclass(frozen=True)
-class BaseModel(metaclass=LoggingMeta):
-    __dataclass_fields__: ClassVar[Dict[str, Field]]
-
+class BaseModel:
     @classmethod
     def fields(cls) -> AbstractSet[str]:
-        return cls.__dataclass_fields__.keys() - {'__dataclass_fields__'}
+        return {f.name for f in fields(cls)} - {"__dataclass_fields__"}
 
     @classmethod
     def create(cls: Type[ModelT_co], data: Any) -> ModelT_co:
         # noinspection PyArgumentList
-        return cls(**{k: data[k] for k in cls.fields() if k in data})  # type: ignore
+        return cast(ModelT_co, cls(**{k: data[k] for k in cls.fields() if k in data}))  # type: ignore
 
     def as_dict(self) -> StrDict:
         """
@@ -55,11 +43,11 @@ class Entity(BaseModel):
 
     @classmethod
     def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:
-        return super().create(data)
+        return super().create(data)  # type: ignore
 
 
 __all__ = [
-    'BaseModel',
-    'Entity',
-    'ModelT_co',
+    "BaseModel",
+    "Entity",
+    "ModelT_co",
 ]

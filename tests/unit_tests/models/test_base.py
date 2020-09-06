@@ -1,14 +1,9 @@
 from dataclasses import dataclass
-from pytest import (
-    fixture,
-    raises,
-)
+
+from pytest import fixture, raises
 
 from instapi.models.base import BaseModel
-from tests.unit_tests.conftest import (
-    random_int,
-    random_string,
-)
+from tests.unit_tests.conftest import random_int, random_string
 
 
 class TestBaseModel:
@@ -26,8 +21,8 @@ class TestBaseModel:
 
     @fixture()
     def mocked_fields(self, mocker):
-        fields = {'a', 'b', 'c'}
-        mocker.patch('instapi.models.base.BaseModel.fields', return_value=fields)
+        fields = {"a", "b", "c"}
+        mocker.patch("instapi.models.base.BaseModel.fields", return_value=fields)
         data = {key: random_int() for key in fields}
 
         return data
@@ -35,7 +30,7 @@ class TestBaseModel:
     def test_fields(self, model_cls):
         """Test for BaseModel.fields classmethod"""
 
-        assert model_cls.fields() == {'a', 'b', 'c'}
+        assert model_cls.fields() == {"a", "b", "c"}
 
     def test_fields_with_inheritance(self):
         """Test for BaseModel.fields classmethod"""
@@ -44,19 +39,19 @@ class TestBaseModel:
         class First(BaseModel):
             a: int
 
-        assert First.fields() == {'a'}
+        assert First.fields() == {"a"}
 
         @dataclass(frozen=True)
         class Two(First):
             b: int
 
-        assert Two.fields() == {'a', 'b'}
+        assert Two.fields() == {"a", "b"}
 
         @dataclass(frozen=True)
         class Three(Two):
             c: int
 
-        assert Three.fields() == {'a', 'b', 'c'}
+        assert Three.fields() == {"a", "b", "c"}
 
     def test_create(self, model_cls, mocked_fields):
         assert model_cls.create(mocked_fields) == model_cls(**mocked_fields)

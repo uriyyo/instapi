@@ -1,17 +1,15 @@
+from dataclasses import dataclass
 from typing import cast
 
-from dataclasses import dataclass
-
-from instapi.client import client
-from instapi.models.base import Entity
-from instapi.types import StrDict
+from ..client import client
+from ..types import StrDict
+from .base import Entity
 
 
 @dataclass(frozen=True)
 class Media(Entity):
-
     def _media_info(self) -> StrDict:
-        items, *_ = client.media_info(self.pk)['items']
+        items, *_ = client.media_info(self.pk)["items"]
         return cast(StrDict, items)
 
     def comment(self, text: str) -> None:
@@ -19,5 +17,5 @@ class Media(Entity):
 
 
 __all__ = [
-    'Media',
+    "Media",
 ]

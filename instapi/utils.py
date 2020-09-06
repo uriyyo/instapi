@@ -1,19 +1,13 @@
 from functools import partial
 from itertools import chain
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import TypeVar
+from typing import Any, Callable, Dict, Iterable, List, Optional, TypeVar
 from uuid import uuid1
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def fetch_key(source: Dict, key_path: str) -> Any:
-    for key in key_path.split('.'):
+    for key in key_path.split("."):
         if key in source:
             source = source[key]
         else:
@@ -23,11 +17,11 @@ def fetch_key(source: Dict, key_path: str) -> Any:
 
 
 def process_many(
-        fetcher: Callable,
-        pk: Optional[int] = None,
-        with_rank_token: bool = False,
-        key: str = 'max_id',
-        key_path: str = 'next_max_id',
+    fetcher: Callable,
+    pk: Optional[int] = None,
+    with_rank_token: bool = False,
+    key: str = "max_id",
+    key_path: str = "next_max_id",
 ) -> Iterable:
     next_value = None
 
@@ -56,7 +50,7 @@ def limited(iterable: Iterable[T], limit: Optional[int] = None) -> Iterable[T]:
         yield from iterable
     else:
         if limit < 0:
-            raise ValueError('Limited can\'t handle negative numbers')
+            raise ValueError("Limited can't handle negative numbers")
 
         yield from (i for _, i in zip(range(limit), iterable))
 
@@ -75,14 +69,14 @@ def flat(source: List[Iterable[T]]) -> List[T]:
     return [*chain.from_iterable(source)]
 
 
-def join(iterable: Iterable, separator: str = ',') -> str:
+def join(iterable: Iterable, separator: str = ",") -> str:
     return separator.join(str(s) for s in iterable)
 
 
 __all__ = [
-    'process_many',
-    'limited',
-    'to_list',
-    'flat',
-    'join',
+    "process_many",
+    "limited",
+    "to_list",
+    "flat",
+    "join",
 ]
