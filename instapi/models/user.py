@@ -1,34 +1,24 @@
 from collections import Counter as RealCounter
 from itertools import chain
-from typing import (
-    Any,
-    Counter,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    TYPE_CHECKING,
-)
+from typing import TYPE_CHECKING
+from typing import Counter
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import cast
 
-from dataclasses import (
-    dataclass,
-)
+from dataclasses import dataclass
 
 from instapi.client import client
 from instapi.models.base import Entity
-from instapi.models.resource import (
-    Image,
-    Resource,
-    Resources,
-    Video,
-)
-from instapi.utils import (
-    process_many,
-    to_list,
-)
+from instapi.models.resource import Resource
+from instapi.types import StrDict
+from instapi.utils import process_many
+from instapi.utils import to_list
 
 if TYPE_CHECKING:
-    from instapi.models.feed import Feed
+    from instapi.models.feed import Feed  # pragma: no cover
+    from instapi.models.story import Story  # pragma: no cover
 
 
 @dataclass(frozen=True)
@@ -40,14 +30,33 @@ class User(Entity):
 
     @classmethod
     def get(cls, pk: int) -> 'User':
+        """
+        Create User object from unique user's identifier
+
+        :param pk: unique user's identifier
+        :return: User object
+        """
         return cls.create(client.user_info(pk)['user'])
 
     @classmethod
     def from_username(cls, username: str) -> 'User':
+        """
+        Create User object from username
+
+        :param username: name of user
+        :return: User object
+        """
         return cls.create(client.username_info(username)['user'])
 
     @classmethod
     def match_username(cls, username: str, limit: Optional[int] = None) -> List['User']:
+        """
+        Search users by username
+
+        :param username: username
+        :param limit: size of resulting list
+        :return: list of User objects
+        """
         response = client.search_users(
             query=username,
             **({'count': limit} if limit is not None else {}),
@@ -57,37 +66,74 @@ class User(Entity):
 
     @classmethod
     def self(cls) -> 'User':
+        """
+        Create User object from current user
+
+        :return: User object
+        """
         return cls.get(client.current_user()['user']['pk'])
 
     @property
-    def biography(self) -> int:
-        return self.user_detail()['biography']
+    def biography(self) -> str:
+        """
+        Return biography of user
+
+        :return: string
+        """
+        return cast(str, self.user_detail()['biography'])
 
     @property
     def media_count(self) -> int:
-        return self.user_detail()['media_count']
+        """
+        Return user's count of post
+
+        :return: number
+        """
+        return cast(int, self.user_detail()['media_count'])
 
     @property
     def follower_count(self) -> int:
-        return self.user_detail()['follower_count']
+        """
+        Return user's count of followers
+
+        :return: number
+        """
+        return cast(int, self.user_detail()['follower_count'])
 
     @property
     def following_count(self) -> int:
-        return self.user_detail()['following_count']
+        """
+        Return count of people, on which user followed
 
-    def user_detail(self) -> Dict[str, Any]:
-        return self.full_info()['user_detail']['user']
+        :return: number
+        """
+        return cast(int, self.user_detail()['following_count'])
 
-    def full_info(self) -> Dict[str, Any]:
-        return client.user_detail_info(self.pk)
+    def user_detail(self) -> StrDict:
+        return cast(StrDict, self.full_info()['user_detail']['user'])
 
-    def follow(self, user: 'User'):
+    def full_info(self) -> StrDict:
+        return cast(StrDict, client.user_detail_info(self.pk))
+
+    def follow(self, user: 'User') -> None:
+        """
+        Follow on user
+
+        :param user: User object
+        :return: None
+        """
         if self != User.self():
             raise ValueError()
 
         client.friendships_create(user.pk)
 
-    def unfollow(self, user: 'User'):
+    def unfollow(self, user: 'User') -> None:
+        """
+        Unfollow from user
+
+        :param user: User object
+        :return: None
+        """
         if self != User.self():
             raise ValueError()
 
@@ -122,10 +168,21 @@ class User(Entity):
         return to_list(self.iter_followers(), limit=limit)
 
     def iter_followings(self) -> Iterable['User']:
+        """
+        Create generator for followers
+
+        :return: generator with User objects
+        """
         for result in process_many(client.user_following, self.pk, with_rank_token=True):
             yield from map(User.create, result['users'])
 
     def followings(self, limit: Optional[int] = None) -> List['User']:
+        """
+        Generate list of followers
+
+        :param limit: number of images, which will be added to the list
+        :return: list with User objects
+        """
         return to_list(self.iter_followings(), limit=limit)
 
     def iter_feeds(self) -> Iterable['Feed']:
@@ -154,14 +211,12 @@ class User(Entity):
     def liked_by_user(self, user: 'User', limit: Optional[int] = None) -> List['Feed']:
         return to_list(self.iter_liked_by_user(user), limit=limit)
 
-    def iter_stories(self) -> Iterable['Resources']:
-        for result in (client.user_story_feed(self.pk)['reel'] or {}).get('items', ()):
-            if 'video_versions' in result:
-                yield Video.create(result['video_versions'][0])
-            else:
-                yield Image.create(result['image_versions2']['candidates'][0])
+    def iter_stories(self) -> Iterable['Story']:
+        from instapi.models.story import Story
+        items = (client.user_story_feed(self.pk)['reel'] or {}).get('items', ())
+        yield from map(Story.create, items)
 
-    def stories(self, limit: Optional[int] = None) -> List['Resources']:
+    def stories(self, limit: Optional[int] = None) -> List['Story']:
         return to_list(self.iter_stories(), limit=limit)
 
 

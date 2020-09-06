@@ -1,0 +1,39 @@
+language: python
+
+install:
+  - pip install ".[dev]"
+
+env:
+  - TEST_CMD="pytest tests"
+
+script:
+  - $TEST_CMD
+
+matrix:
+  include:
+    - name: "flake8"
+      python: 3.6
+      env:
+        - TEST_CMD="flake8 instapi"
+
+    - name: "mypy"
+      python: "3.6"
+      env:
+        - TEST_CMD="mypy instapi"
+
+    - name: "codecov"
+      python: "3.6"
+      env:
+        - TEST_CMD="pytest --cov-report term --cov=instapi tests"
+      after_success:
+        - curl -s https://codecov.io/bash | bash
+
+    - name: "3.6"
+      python: "3.6"
+
+    - name: "3.7"
+      python: "3.7"
+
+    - name: "3.8"
+      python: "3.8-dev"
+

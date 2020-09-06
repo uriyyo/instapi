@@ -1,33 +1,37 @@
-from typing import (
-    Iterable,
-    List,
-    Optional,
-)
+from typing import Iterable
+from typing import List
+from typing import Optional
 
 from dataclasses import dataclass
 
 from instapi.client import client
-from instapi.models.base import Media
 from instapi.models.comment import Comment
-from instapi.models.resource import (
-    Image,
-    Resources,
-    Video,
-)
+from instapi.models.resource import ResourceContainer
 from instapi.models.user import User
-from instapi.utils import (
-    process_many,
-    to_list,
-)
+from instapi.types import StrDict
+from instapi.utils import process_many
+from instapi.utils import to_list
 
 
 @dataclass(frozen=True)
-class Feed(Media):
+class Feed(ResourceContainer):
+    """
+    This class represent Instagram's feed. It gives opportunity to:
+    -   Get posts from feed
+    -   Get info about post (comments, which was attached to the post; users, which has liked the post)
+    -   Like/Unlike posts
+    -   Get media (videos and images) from posts
+    """
     like_count: int
-    comment_count: int
+    comment_count: int = 0
 
     @classmethod
     def iter_timeline(cls) -> Iterable['Feed']:
+        """
+        Create generator for iteration over posts from feed
+
+        :return: generator with posts from feed
+        """
         for result in process_many(client.feed_timeline):
             yield from (
                 Feed.create(data['media_or_ad']) for data in result['feed_items']
@@ -36,28 +40,88 @@ class Feed(Media):
 
     @classmethod
     def timeline(cls, limit: Optional[int] = None) -> List['Feed']:
+        """
+        Generate list of posts from feed
+
+        :param limit: number of posts, which will be added to the list
+        :return: list with posts from feed
+        """
         return to_list(cls.iter_timeline(), limit=limit)
 
+    def _resources(self) -> Iterable['StrDict']:
+        """
+        Feed can contain multiple images and videos that located in carousel_media
+
+        :return: source of videos or images
+        """
+        media_info = self._media_info()
+        return media_info.get('carousel_media', [media_info])
+
+    def user_tags(self) -> List['User']:
+        """
+        Generate list of Users from Feed usertags
+
+        :return: list of Users from usertags
+        """
+        info = self._media_info()
+
+        if 'usertags' not in info:
+            return []
+
+        return [User.create(u['user']) for u in info['usertags']['in']]
+
     def iter_likes(self) -> Iterable['User']:
+        """
+        Create generator for iteration over posts from feed
+
+        :return: generator with users, which has liked a post
+        """
         for result in process_many(client.media_likers, self.pk):
             yield from map(User.create, result['users'])
 
     def likes(self, limit: Optional[int] = None) -> List['User']:
+        """
+        Generate list of users, which has liked a post
+
+        :param limit: number of users, which will be added to the list
+        :return: list with users, which has liked a post
+        """
         return to_list(self.iter_likes(), limit=limit)
 
     def liked_by(self, user: 'User') -> bool:
+        """
+        Check if post was liked by user
+
+        :param user: user for checking
+        :return: boolean value
+        """
         return any(
             any(user.pk == u['pk'] for u in result['users'])
             for result in process_many(client.media_likers, self.pk)
         )
 
     def like(self) -> None:
+        """
+        Like post
+
+        :return: none
+        """
         client.post_like(self.pk)
 
     def unlike(self) -> None:
+        """
+        Unlike post
+
+        :return: none
+        """
         client.delete_like(self.pk)
 
     def iter_comments(self) -> Iterable['Comment']:
+        """
+        Create generator for iteration over comments, which was attached to the post
+
+        :return: generator with comments
+        """
         for result in process_many(client.media_comments, self.pk):
             for c in result['comments']:
                 c['user'] = User.create(c['user'])
@@ -65,39 +129,13 @@ class Feed(Media):
             yield from map(Comment.create, result['comments'])
 
     def comments(self, limit: Optional[int] = None) -> List['Comment']:
+        """
+        Generate list of comments, which was attached to the post
+
+        :param limit: number of comments, which will be added to the list
+        :return: list with comments
+        """
         return to_list(self.iter_comments(), limit=limit)
-
-    def iter_resources(self, *, video: bool = True, image: bool = True) -> Iterable[Resources]:
-        # TODO: implement ability to fetch media with different quality
-        media_info = self._media_info()
-        carousel_media = media_info.get('carousel_media', [media_info])
-
-        for media in carousel_media:
-            if 'video_versions' in media and video:
-                yield Video.create(media['video_versions'][0])
-            elif 'video_versions' not in media and image:
-                yield Image.create(media['image_versions2']['candidates'][0])
-
-    def resources(self, video: bool = True, image: bool = True, limit: Optional[int] = None) -> List[Resources]:
-        return to_list(self.iter_resources(video=video, image=image), limit=limit)
-
-    def iter_videos(self) -> Iterable['Video']:
-        return self.iter_resources(video=True, image=False)
-
-    def videos(self, limit: Optional[int] = None) -> List['Video']:
-        return to_list(self.iter_videos(), limit=limit)
-
-    def iter_images(self) -> Iterable['Image']:
-        return self.iter_resources(video=False, image=True)
-
-    def images(self, limit: Optional[int] = None) -> List['Image']:
-        return to_list(self.iter_images(), limit=limit)
-
-    def image(self) -> Optional['Image']:
-        return next(iter(self.iter_images()), None)
-
-    def video(self) -> Optional['Video']:
-        return next(iter(self.iter_videos()), None)
 
 
 __all__ = [
