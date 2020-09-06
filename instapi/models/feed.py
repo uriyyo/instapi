@@ -1,16 +1,12 @@
-from typing import Iterable
-from typing import List
-from typing import Optional
-
 from dataclasses import dataclass
+from typing import Iterable, List, Optional
 
-from instapi.client import client
-from instapi.models.comment import Comment
-from instapi.models.resource import ResourceContainer
-from instapi.models.user import User
-from instapi.types import StrDict
-from instapi.utils import process_many
-from instapi.utils import to_list
+from ..client import client
+from ..types import StrDict
+from ..utils import process_many, to_list
+from .comment import Comment
+from .resource import ResourceContainer
+from .user import User
 
 
 @dataclass(frozen=True)
@@ -22,11 +18,12 @@ class Feed(ResourceContainer):
     -   Like/Unlike posts
     -   Get media (videos and images) from posts
     """
+
     like_count: int
     comment_count: int = 0
 
     @classmethod
-    def iter_timeline(cls) -> Iterable['Feed']:
+    def iter_timeline(cls) -> Iterable["Feed"]:
         """
         Create generator for iteration over posts from feed
 
@@ -34,12 +31,13 @@ class Feed(ResourceContainer):
         """
         for result in process_many(client.feed_timeline):
             yield from (
-                Feed.create(data['media_or_ad']) for data in result['feed_items']
-                if 'media_or_ad' in data
+                Feed.create(data["media_or_ad"])
+                for data in result["feed_items"]
+                if "media_or_ad" in data
             )
 
     @classmethod
-    def timeline(cls, limit: Optional[int] = None) -> List['Feed']:
+    def timeline(cls, limit: Optional[int] = None) -> List["Feed"]:
         """
         Generate list of posts from feed
 
@@ -48,16 +46,16 @@ class Feed(ResourceContainer):
         """
         return to_list(cls.iter_timeline(), limit=limit)
 
-    def _resources(self) -> Iterable['StrDict']:
+    def _resources(self) -> Iterable["StrDict"]:
         """
         Feed can contain multiple images and videos that located in carousel_media
 
         :return: source of videos or images
         """
         media_info = self._media_info()
-        return media_info.get('carousel_media', [media_info])
+        return media_info.get("carousel_media", [media_info])
 
-    def user_tags(self) -> List['User']:
+    def user_tags(self) -> List["User"]:
         """
         Generate list of Users from Feed usertags
 
@@ -65,21 +63,21 @@ class Feed(ResourceContainer):
         """
         info = self._media_info()
 
-        if 'usertags' not in info:
+        if "usertags" not in info:
             return []
 
-        return [User.create(u['user']) for u in info['usertags']['in']]
+        return [User.create(u["user"]) for u in info["usertags"]["in"]]
 
-    def iter_likes(self) -> Iterable['User']:
+    def iter_likes(self) -> Iterable["User"]:
         """
         Create generator for iteration over posts from feed
 
         :return: generator with users, which has liked a post
         """
         for result in process_many(client.media_likers, self.pk):
-            yield from map(User.create, result['users'])
+            yield from map(User.create, result["users"])
 
-    def likes(self, limit: Optional[int] = None) -> List['User']:
+    def likes(self, limit: Optional[int] = None) -> List["User"]:
         """
         Generate list of users, which has liked a post
 
@@ -88,7 +86,7 @@ class Feed(ResourceContainer):
         """
         return to_list(self.iter_likes(), limit=limit)
 
-    def liked_by(self, user: 'User') -> bool:
+    def liked_by(self, user: "User") -> bool:
         """
         Check if post was liked by user
 
@@ -96,7 +94,7 @@ class Feed(ResourceContainer):
         :return: boolean value
         """
         return any(
-            any(user.pk == u['pk'] for u in result['users'])
+            any(user.pk == u["pk"] for u in result["users"])
             for result in process_many(client.media_likers, self.pk)
         )
 
@@ -116,19 +114,19 @@ class Feed(ResourceContainer):
         """
         client.delete_like(self.pk)
 
-    def iter_comments(self) -> Iterable['Comment']:
+    def iter_comments(self) -> Iterable["Comment"]:
         """
         Create generator for iteration over comments, which was attached to the post
 
         :return: generator with comments
         """
         for result in process_many(client.media_comments, self.pk):
-            for c in result['comments']:
-                c['user'] = User.create(c['user'])
+            for c in result["comments"]:
+                c["user"] = User.create(c["user"])
 
-            yield from map(Comment.create, result['comments'])
+            yield from map(Comment.create, result["comments"])
 
-    def comments(self, limit: Optional[int] = None) -> List['Comment']:
+    def comments(self, limit: Optional[int] = None) -> List["Comment"]:
         """
         Generate list of comments, which was attached to the post
 
@@ -139,5 +137,5 @@ class Feed(ResourceContainer):
 
 
 __all__ = [
-    'Feed',
+    "Feed",
 ]

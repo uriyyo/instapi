@@ -1,24 +1,18 @@
 import io
 from pathlib import Path
 
-from pytest import (
-    fixture,
-    mark,
-    raises,
-)
+from pytest import fixture, mark, raises
 
 from instapi import Resource
 from instapi.models.resource import Candidate
-from ..conftest import (
-    random_bytes,
-    random_string,
-)
+
+from ..conftest import random_bytes, random_string
 
 
 @fixture
 def mock_content(mocker):
     content = random_bytes()
-    mock = mocker.patch('instapi.Candidate.content', side_effect=lambda: io.BytesIO(content))
+    mock = mocker.patch("instapi.Candidate.content", side_effect=lambda: io.BytesIO(content))
 
     return mock, content
 
@@ -28,9 +22,9 @@ class TestImage:
     Test for Image class
     """
 
-    @mark.usefixtures('mock_content')
+    @mark.usefixtures("mock_content")
     def test_image(self, mocker, image):
-        open_mock = mocker.patch('PIL.Image.open')
+        open_mock = mocker.patch("PIL.Image.open")
 
         image.preview()
 
@@ -46,18 +40,21 @@ class TestCandidate:
     def mock_requests_get(self, mocker):
         resource_content = random_bytes()
         get_mock = mocker.patch(
-            'requests.get',
+            "requests.get",
             return_value=mocker.Mock(raw=io.BytesIO(resource_content)),
         )
         return get_mock, resource_content
 
     @mark.parametrize(
-        'url,filename',
+        "url,filename",
         [
-            ['http://instapi.com/sasha.jpg', 'sasha.jpg'],
-            ['https://instapi/images/thumb/5/not-sasha.jpg/this-is-sasha.jpg', 'this-is-sasha.jpg'],
-            ['https://instapi/images/sasha.jpg?age=too_old&for=school', 'sasha.jpg'],
-        ]
+            ["http://instapi.com/sasha.jpg", "sasha.jpg"],
+            [
+                "https://instapi/images/thumb/5/not-sasha.jpg/this-is-sasha.jpg",
+                "this-is-sasha.jpg",
+            ],
+            ["https://instapi/images/sasha.jpg?age=too_old&for=school", "sasha.jpg"],
+        ],
     )
     def test_filename(self, resource, url, filename):
         r = Candidate(0, 0, url)
@@ -71,7 +68,7 @@ class TestCandidate:
 
         get_mock.assert_called_with(candidate.url, stream=True)
 
-    @mark.usefixtures('mock_content')
+    @mark.usefixtures("mock_content")
     def test_download_without_param(self, tmp_path, candidate):
         candidate.download()
 
@@ -79,16 +76,16 @@ class TestCandidate:
 
         candidate.filename.unlink()
 
-    @mark.usefixtures('mock_content')
+    @mark.usefixtures("mock_content")
     def test_download_with_path(self, tmp_path, candidate):
         candidate.download(tmp_path)
         result_path: Path = tmp_path / candidate.filename
 
         assert result_path.exists()
 
-    @mark.usefixtures('mock_content')
+    @mark.usefixtures("mock_content")
     def test_download_with_path_and_filename(self, tmp_path, resource):
-        rand_filename = random_string() + '.jpg'
+        rand_filename = random_string() + ".jpg"
         resource.download(tmp_path, rand_filename)
         result_path: Path = tmp_path / rand_filename
 
@@ -101,11 +98,11 @@ class TestResource:
     """
 
     @mark.parametrize(
-        'data',
+        "data",
         [
             [{}],
-            [{'invalid_key': []}],
-        ]
+            [{"invalid_key": []}],
+        ],
     )
     def test_from_data_invalid_data(self, data):
         assert Resource.from_data(data) is None
@@ -116,23 +113,22 @@ class TestResource:
 
 
 class TestResourceContainer:
-
     @fixture
     def mock_images(self, mocker, images):
         return mocker.patch(
-            'instapi.models.media.Media._media_info',
+            "instapi.models.media.Media._media_info",
             return_value=images[0].as_dict(),
         )
 
     @fixture
     def mock_videos(self, mocker, videos):
         return mocker.patch(
-            'instapi.models.media.Media._media_info',
+            "instapi.models.media.Media._media_info",
             return_value=videos[0].as_dict(),
         )
 
     def test_resources(self, mocker, resource_container):
-        mock = mocker.patch('instapi.models.media.Media._media_info')
+        mock = mocker.patch("instapi.models.media.Media._media_info")
 
         resource_container._resources()
 

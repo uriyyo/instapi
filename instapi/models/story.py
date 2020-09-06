@@ -1,13 +1,11 @@
-from typing import List
-from typing import Type
-
 from dataclasses import dataclass
+from typing import List, Type
 
-from instapi.client import client
-from instapi.models.base import ModelT_co
-from instapi.models.resource import ResourceContainer
-from instapi.models.user import User
-from instapi.types import StrDict
+from ..client import client
+from ..types import StrDict
+from .base import ModelT_co
+from .resource import ResourceContainer
+from .user import User
 
 
 @dataclass(frozen=True)
@@ -15,9 +13,10 @@ class Story(ResourceContainer):
     """
     Class that represent user story
     """
+
     # TODO: Add ability to send reactions on the story
 
-    mentions: List['User']
+    mentions: List["User"]
 
     @classmethod
     def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:
@@ -28,10 +27,12 @@ class Story(ResourceContainer):
         :param data: information about a story
         :return: Story instance
         """
-        return super().create({
-            **data,
-            'mentions': [User.create(d['user']) for d in data.get('reel_mentions', ())],
-        })
+        return super().create(  # type: ignore
+            {
+                **data,
+                "mentions": [User.create(d["user"]) for d in data.get("reel_mentions", ())],
+            }
+        )
 
     def as_dict(self) -> StrDict:
         """
@@ -40,7 +41,7 @@ class Story(ResourceContainer):
         :return: dict with information about story
         """
         data = super().as_dict()
-        data['reel_mentions'] = [{'user': user} for user in data.pop('mentions')]
+        data["reel_mentions"] = [{"user": user} for user in data.pop("mentions")]
 
         return data
 
@@ -56,5 +57,5 @@ class Story(ResourceContainer):
 
 
 __all__ = [
-    'Story',
+    "Story",
 ]

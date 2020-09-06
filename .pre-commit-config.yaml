@@ -1,40 +1,29 @@
-default_stages: [push]
-
 repos:
-  - repo: local
+  - repo: https://github.com/asottile/seed-isort-config
+    rev: v2.2.0
     hooks:
-      - id: pytest
-        name: Check pytest unit tests pass
-        entry: pytest tests
-        language: system
-        types: [python]
-        always_run: true
-        pass_filenames: false
-        stages: [push, commit]
+      - id: seed-isort-config
 
-      - id: mypy
-        name: Check mypy static types match
-        entry: mypy instapi
-        language: system
-        types: [python]
-        always_run: true
-        pass_filenames: false
-        stages: [push, commit]
-
-      - id: flake8
-        name: Check flake8 rules match
-        entry: flake8 instapi
-        language: system
-        types: [python]
-        always_run: true
-        pass_filenames: false
-        stages: [push, commit]
-
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.5.1
+    hooks:
       - id: isort
-        name: Run isort to set correct order of imports
-        entry: flake8 instapi
-        language: system
-        types: [python]
-        always_run: true
-        pass_filenames: false
-        stages: [push, commit]
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.782
+    hooks:
+      - id: mypy
+        exclude: tests
+
+  - repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+      - id: black
+        language_version: python3.7

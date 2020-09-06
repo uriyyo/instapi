@@ -1,40 +1,24 @@
 from functools import partial
 from random import shuffle
-from typing import (
-    Iterable,
-    List,
-    Tuple,
-    Type,
-    TypeVar,
-)
+from typing import Iterable, List, Tuple, Type, TypeVar
 
 from pytest import fixture
 
 from instapi import Direct
-from instapi.models import (
-    Comment,
-    Entity,
-    Feed,
-    Media,
-    User,
-)
+from instapi.models import Comment, Entity, Feed, Media, User
 from instapi.models.direct import Message
 from instapi.models.resource import (
     Candidate,
     Image,
     Resource,
-    Video,
     ResourceContainer,
+    Video,
 )
 from instapi.models.story import Story
-from ..conftest import (
-    rand,
-    random_int,
-    random_url,
-    rands,
-)
 
-T = TypeVar('T')
+from ..conftest import rand, random_int, random_url, rands
+
+T = TypeVar("T")
 
 
 def as_dicts(models: Iterable[T]) -> List[T]:
@@ -67,7 +51,7 @@ def create_feeds(length: int = 10) -> List[Feed]:
     return rands(Feed, length)
 
 
-def create_candidates(length: int = 10, extension: str = '.jpg') -> Tuple[Candidate]:
+def create_candidates(length: int = 10, extension: str = ".jpg") -> Tuple[Candidate]:
     """
     Generate list of dummy resource candidates
 
@@ -79,9 +63,9 @@ def create_candidates(length: int = 10, extension: str = '.jpg') -> Tuple[Candid
 
 
 def create_resource(
-        length: int = 10,
-        extension: str = '.jpg',
-        resource_cls: Type[T] = Resource,
+    length: int = 10,
+    extension: str = ".jpg",
+    resource_cls: Type[T] = Resource,
 ) -> List[T]:
     """
     Generate list of dummy resources
@@ -125,7 +109,7 @@ def create_videos(length: int = 10) -> List[Video]:
     :param length: length of list
     :return: list of dummy videos
     """
-    return create_resource(resource_cls=Video, extension='.mp4', length=length)
+    return create_resource(resource_cls=Video, extension=".mp4", length=length)
 
 
 def create_directs(length: int = 10) -> List[Direct]:
@@ -179,28 +163,28 @@ def media():
 @fixture()
 def image():
     """Fixture that return dummy image"""
-    im, = create_images(length=1)
+    (im,) = create_images(length=1)
     return im
 
 
 @fixture()
 def resource():
     """Fixture that return dummy resource"""
-    resp, = create_resource(length=1)
+    (resp,) = create_resource(length=1)
     return resp
 
 
 @fixture()
 def feed() -> Feed:
     """Fixture that return dummy feed"""
-    f, = create_feeds(length=1)
+    (f,) = create_feeds(length=1)
     return f
 
 
 @fixture()
 def candidate() -> Candidate:
     """Fixture that return dummy candidate"""
-    c, = create_candidates(length=1)
+    (c,) = create_candidates(length=1)
     return c
 
 

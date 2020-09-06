@@ -2,40 +2,34 @@ from typing import Generator
 
 from pytest import fixture
 
-from instapi import (
-    Direct,
-    Message,
-    User,
-)
+from instapi import Direct, Message, User
 from tests.unit_tests.models.conftest import as_dicts
-from ..conftest import (
-    random_int,
-    random_string,
-)
+
+from ..conftest import random_int, random_string
 
 
 def test_direct_create(user):
     data = {
-        'thread_title': random_string(),
-        'thread_type': random_string(),
-        'is_group': False,
-        'users': [user.as_dict()],
-        'thread_id': random_int(),
+        "thread_title": random_string(),
+        "thread_type": random_string(),
+        "is_group": False,
+        "users": [user.as_dict()],
+        "thread_id": random_int(),
     }
 
     direct = Direct.create(data)
 
-    assert {**data, 'users': tuple(User.create(d) for d in data['users'])} == vars(direct)
+    assert {**data, "users": tuple(User.create(d) for d in data["users"])} == vars(direct)
 
 
 class TestDirects:
     @fixture
     def inbox_data(self, directs):
-        return {'inbox': {'threads': as_dicts(directs)}}
+        return {"inbox": {"threads": as_dicts(directs)}}
 
     @fixture
     def mock_inbox(self, mocker, inbox_data):
-        return mocker.patch('instapi.client.client.direct_v2_inbox', return_value=inbox_data)
+        return mocker.patch("instapi.client.client.direct_v2_inbox", return_value=inbox_data)
 
     def test_iter_direct_return_type(self):
         assert isinstance(Direct.iter_directs(), Generator)
@@ -54,7 +48,7 @@ class TestDirects:
 class TestMessages:
     @fixture
     def message_data(self, direct, messages):
-        return {'thread': {'items': as_dicts(messages)}}
+        return {"thread": {"items": as_dicts(messages)}}
 
     @fixture
     def mock_user_get(self, messages, mocker):
@@ -63,11 +57,11 @@ class TestMessages:
         def get(key):
             return users[key]
 
-        mocker.patch('instapi.models.user.User.get', side_effect=get)
+        mocker.patch("instapi.models.user.User.get", side_effect=get)
 
     @fixture
     def mock_thread(self, mocker, message_data, mock_user_get):
-        return mocker.patch('instapi.client.client.direct_v2_thread', return_value=message_data)
+        return mocker.patch("instapi.client.client.direct_v2_thread", return_value=message_data)
 
     def test_iter_direct_return_type(self, direct):
         assert isinstance(direct.iter_message(), Generator)
@@ -84,14 +78,14 @@ class TestMessages:
 
 
 def test_messages_cache(mocker, message):
-    mocker.patch('instapi.models.user.User.get', return_value=message.user)
+    mocker.patch("instapi.models.user.User.get", return_value=message.user)
 
     data = message.as_dict()
     cache = {}
 
     m1 = Message.create({**data}, cache)
 
-    assert data['user_id'] in cache
+    assert data["user_id"] in cache
 
     m2 = Message.create({**data}, cache)
 
@@ -102,14 +96,14 @@ def test_messages_cache(mocker, message):
 class TestWithUser:
     def test_with_user_thread_exists(self, mocker, direct, user):
         mocker.patch(
-            'instapi.client.client.direct_v2_get_by_participants',
-            return_value={'thread': direct.as_dict()},
+            "instapi.client.client.direct_v2_get_by_participants",
+            return_value={"thread": direct.as_dict()},
         )
         assert Direct.with_user(user) == direct
 
     def test_with_user_thread_doesnt_exists(self, mocker, user):
         mocker.patch(
-            'instapi.client.client.direct_v2_get_by_participants',
+            "instapi.client.client.direct_v2_get_by_participants",
             return_value={},
         )
 
@@ -120,7 +114,7 @@ class TestWithUser:
 
 
 def test_send_text(mocker, direct):
-    mock = mocker.patch('instapi.client.client.direct_v2_send_text')
+    mock = mocker.patch("instapi.client.client.direct_v2_send_text")
 
     text = random_string()
     direct.send_text(text)
@@ -132,7 +126,7 @@ def test_send_text(mocker, direct):
 
 
 def test_send_link(mocker, direct):
-    mock = mocker.patch('instapi.client.client.direct_v2_send_link')
+    mock = mocker.patch("instapi.client.client.direct_v2_send_link")
 
     link = random_string()
     text = random_string()
@@ -146,7 +140,7 @@ def test_send_link(mocker, direct):
 
 
 def test_send_profile(mocker, direct, user):
-    mock = mocker.patch('instapi.client.client.direct_v2_send_profile')
+    mock = mocker.patch("instapi.client.client.direct_v2_send_profile")
 
     text = random_string()
     direct.send_profile(user, text)
@@ -159,7 +153,7 @@ def test_send_profile(mocker, direct, user):
 
 
 def test_send_hashtag(mocker, direct, user):
-    mock = mocker.patch('instapi.client.client.direct_v2_send_hashtag')
+    mock = mocker.patch("instapi.client.client.direct_v2_send_hashtag")
 
     text = random_string()
     hashtag = random_string()
@@ -173,7 +167,7 @@ def test_send_hashtag(mocker, direct, user):
 
 
 def test_send_media(mocker, direct, feed):
-    mock = mocker.patch('instapi.client.client.direct_v2_send_media_share')
+    mock = mocker.patch("instapi.client.client.direct_v2_send_media_share")
 
     text = random_string()
     direct.send_media(feed, text)

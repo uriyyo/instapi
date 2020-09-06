@@ -1,6 +1,6 @@
 def test_like_comment(comment, mocker):
     """Test for Comment.like method"""
-    like_mock = mocker.patch('instapi.client.client.comment_like')
+    like_mock = mocker.patch("instapi.client.client.comment_like")
 
     comment.like()
 
@@ -9,7 +9,7 @@ def test_like_comment(comment, mocker):
 
 def test_unlike_comment(comment, mocker):
     """Test for Comment.unlike method"""
-    unlike_mock = mocker.patch('instapi.client.client.comment_unlike')
+    unlike_mock = mocker.patch("instapi.client.client.comment_unlike")
 
     comment.unlike()
 

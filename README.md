@@ -36,18 +36,6 @@ for feed in instagram_profile.iter_feeds():
   feed.like()
 ```
 
-Install requires
-----------------
-* dataclasses (version 0.6.0)
-* instagram-private-api (version 1.6.0.0)
-* Pillow (version 6.1.0)
-* requests (version 2.22.0)
-
-Release History
----------------
-* 0.0.1
-  * Work in progress
-
 Contribute
 ----------
 Contributions are always welcome!

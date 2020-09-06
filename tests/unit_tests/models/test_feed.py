@@ -1,62 +1,61 @@
 from pytest import fixture
 
-from .conftest import as_dicts
 from ..conftest import random_int
+from .conftest import as_dicts
 
 
 class TestFeed:
-
     @fixture
     def mock_likers(self, mocker, users):
         return mocker.patch(
-            'instapi.client.client.media_likers',
-            return_value={'users': as_dicts(users)},
+            "instapi.client.client.media_likers",
+            return_value={"users": as_dicts(users)},
         )
 
     @fixture
     def mock_comments(self, mocker, comments):
         return mocker.patch(
-            'instapi.client.client.media_comments',
-            return_value={'comments': as_dicts(comments)},
+            "instapi.client.client.media_comments",
+            return_value={"comments": as_dicts(comments)},
         )
 
     @fixture
     def mock_timeline(self, mocker, feeds):
         return mocker.patch(
-            'instapi.client.client.feed_timeline',
-            return_value={'feed_items': [{'media_or_ad': f.as_dict()} for f in feeds]},
+            "instapi.client.client.feed_timeline",
+            return_value={"feed_items": [{"media_or_ad": f.as_dict()} for f in feeds]},
         )
 
     def test_usertags_one_user(self, mocker, feed, user):
         mocker.patch(
-            'instapi.models.feed.Feed._media_info',
-            return_value={'usertags': {'in': [{'user': user.as_dict()}]}},
+            "instapi.models.feed.Feed._media_info",
+            return_value={"usertags": {"in": [{"user": user.as_dict()}]}},
         )
 
         assert feed.user_tags() == [user]
 
     def test_usertags_many_users(self, mocker, feed, users):
         mocker.patch(
-            'instapi.models.feed.Feed._media_info',
-            return_value={'usertags': {'in': [{'user': u} for u in as_dicts(users)]}},
+            "instapi.models.feed.Feed._media_info",
+            return_value={"usertags": {"in": [{"user": u} for u in as_dicts(users)]}},
         )
 
         assert feed.user_tags() == users
 
     def test_usertags_no_users(self, mocker, feed):
-        mocker.patch('instapi.models.feed.Feed._media_info', return_value={})
+        mocker.patch("instapi.models.feed.Feed._media_info", return_value={})
 
         assert not feed.user_tags()
 
     def test_like(self, mocker, feed):
-        like_mock = mocker.patch('instapi.client.client.post_like')
+        like_mock = mocker.patch("instapi.client.client.post_like")
 
         feed.like()
 
         like_mock.assert_called_once_with(feed.pk)
 
     def test_unlike(self, mocker, feed):
-        unlike_mock = mocker.patch('instapi.client.client.delete_like')
+        unlike_mock = mocker.patch("instapi.client.client.delete_like")
 
         feed.unlike()
 
@@ -110,4 +109,3 @@ class TestFeed:
         feeds = feed.timeline(limit=limit)
 
         assert feeds == feeds[:limit]
-
