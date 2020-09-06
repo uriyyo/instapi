@@ -22,8 +22,5 @@ jobs:
           pip install poetry
           poetry install
 
-      - name: Install dependencies
-        run: poetry install
-
       - name: Lint
         run: poetry run pre-commit run --all-files --show-diff-on-failure
