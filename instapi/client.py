@@ -6,7 +6,9 @@ from typing import Optional
 from typing import cast
 
 from dataclasses import dataclass
+from instagram_private_api import ClientError
 
+from instapi import cache
 from instapi.client_api import Client
 from instapi.exceptions import ClientNotInitedException
 from instapi.utils import LoggingMeta
@@ -44,7 +46,12 @@ def bind(
     if username is None or password is None:
         raise ValueError("Both username and password should be passed")
 
-    client.obj = Client(username, password)
+    try:
+        client.obj = Client(username, password, cookie=cache.get_from_cache((username, password)))
+    except ClientError:  # pragma: no cover
+        client.obj = Client(username, password)
+
+    cache.write_to_cache((username, password), client.obj.cookie_jar)
 
 
 __all__ = [
