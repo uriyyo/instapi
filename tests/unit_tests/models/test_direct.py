@@ -77,22 +77,6 @@ class TestMessages:
         assert direct.messages(limit) == messages[:limit]
 
 
-def test_messages_cache(mocker, message):
-    mocker.patch("instapi.models.user.User.get", return_value=message.user)
-
-    data = message.as_dict()
-    cache = {}
-
-    m1 = Message.create({**data}, cache)
-
-    assert data["user_id"] in cache
-
-    m2 = Message.create({**data}, cache)
-
-    # Second call should use user from a cache
-    assert m1.user is m2.user
-
-
 class TestWithUser:
     def test_with_user_thread_exists(self, mocker, direct, user):
         mocker.patch(
