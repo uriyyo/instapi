@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Type
+from typing import Any, Iterable, List, Optional, Tuple, Type
 
+from ..cache import cached
 from ..client import client
 from ..types import StrDict
 from ..utils import process_many, to_list
@@ -19,18 +20,9 @@ class Message(BaseModel):
     story_share: StrDict = field(default_factory=dict)
 
     @classmethod
-    def create(cls: Type[ModelT_co], data: StrDict, cache: Dict[int, User] = None) -> ModelT_co:
+    def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:
         user_id = data.pop("user_id")
-
-        if cache is not None and user_id in cache:
-            user = cache[user_id]
-        else:
-            user = User.get(user_id)
-
-            if cache is not None:
-                cache[user_id] = user
-
-        return super().create({"user": user, **data})  # type: ignore
+        return super().create({"user": User.get(user_id), **data})  # type: ignore
 
     def as_dict(self) -> StrDict:
         data = super().as_dict()
@@ -68,6 +60,7 @@ class Direct(BaseModel):
         return to_list(cls.iter_directs(), limit)
 
     @classmethod
+    @cached
     def with_user(cls: Type[ModelT_co], user: User) -> ModelT_co:
         result = client.direct_v2_get_by_participants(user)
 
@@ -77,15 +70,13 @@ class Direct(BaseModel):
             return cls(user.username, "private", False, (user,))  # type: ignore
 
     def iter_message(self) -> Iterable["Message"]:
-        cache: Dict[int, User] = {}
-
         for response in process_many(
             client.direct_v2_thread,
             self.thread_id,
             key="cursor",
             key_path="thread.oldest_cursor",
         ):
-            yield from (Message.create(item, cache) for item in response["thread"]["items"])
+            yield from map(Message.create, response["thread"]["items"])
 
     def messages(self, limit: Optional[int] = None) -> List["Message"]:
         return to_list(self.iter_message(), limit)

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, List, Optional
 
+from ..cache import cached
 from ..client import client
 from ..types import StrDict
 from ..utils import process_many, to_list
@@ -55,6 +56,7 @@ class Feed(ResourceContainer):
         media_info = self._media_info()
         return media_info.get("carousel_media", [media_info])
 
+    @cached
     def user_tags(self) -> List["User"]:
         """
         Generate list of Users from Feed usertags

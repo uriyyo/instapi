@@ -127,8 +127,7 @@ def test_user_details(user, mocker):
     assert user.user_detail() == user_details
     assert user.full_info() == full_info
 
-    details_mock.assert_called_with(user.pk)
-    assert details_mock.call_count == 6
+    details_mock.assert_called_once_with(user.pk)
 
 
 def test_follow(user, mocker):

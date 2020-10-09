@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import TYPE_CHECKING, Counter, Iterable, List, Optional, cast
 
+from ..cache import cached
 from ..client import client
 from ..types import StrDict
 from ..utils import process_many, to_list
@@ -22,6 +23,7 @@ class User(Entity):
     is_verified: bool
 
     @classmethod
+    @cached
     def get(cls, pk: int) -> "User":
         """
         Create User object from unique user's identifier
@@ -32,6 +34,7 @@ class User(Entity):
         return cls.create(client.user_info(pk)["user"])
 
     @classmethod
+    @cached
     def from_username(cls, username: str) -> "User":
         """
         Create User object from username
@@ -58,6 +61,7 @@ class User(Entity):
         return [cls.create(user) for user in response["users"]]
 
     @classmethod
+    @cached
     def self(cls) -> "User":
         """
         Create User object from current user
@@ -105,6 +109,7 @@ class User(Entity):
     def user_detail(self) -> StrDict:
         return cast(StrDict, self.full_info()["user_detail"]["user"])
 
+    @cached
     def full_info(self) -> StrDict:
         return cast(StrDict, client.user_detail_info(self.pk))
 
