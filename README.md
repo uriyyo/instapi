@@ -15,9 +15,9 @@ InstAPI - comfortable and easy to use Python's library for interaction with Inst
 
 Installation
 ------------
-1. Download InstAPI from this repository.
-2. Run `pip install -e [PATH to directory with InstAPI]` in console.
-3. Done!
+```bash
+pip install inst-api
+```
 
 Usage
 -----
