@@ -1,7 +1,0 @@
-[flake8]
-ignore = F401, F811, D, I004, I001
-max-line-length = 120
-exclude = .tox
-show-source = true
-enable-extensions = G
-application-import-names = instapi

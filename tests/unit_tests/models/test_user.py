@@ -1,30 +1,14 @@
 from collections import Counter
-from typing import (
-    Iterable,
-    List,
-)
+from typing import Iterable, List
 
-from pytest import (
-    fixture,
-    raises,
-)
+from pytest import fixture, raises
 
-from instapi.models import (
-    Feed,
-    User,
-)
-from instapi.models.resource import (
-    Resources,
-)
+from instapi.models import Feed, User
+from instapi.models.resource import Resources
 from instapi.utils import flat
-from .conftest import (
-    as_dicts,
-    create_users,
-)
-from ..conftest import (
-    random_int,
-    random_string,
-)
+
+from ..conftest import random_int, random_string
+from .conftest import as_dicts, create_users
 
 
 @fixture()
@@ -32,16 +16,18 @@ def mock_feeds_with_resources(mocker, feeds, images, videos):
     """
     Fixture that mocks user feeds and feeds resources
     """
-    mocker.patch('instapi.models.User.iter_feeds', return_value=feeds)
-    mocker.patch('instapi.models.Media._media_info', return_value={})
+    mocker.patch("instapi.models.User.iter_feeds", return_value=feeds)
+    mocker.patch("instapi.models.Media._media_info", return_value={})
 
-    def mocked_resources(resource_data, video: bool = True, image: bool = True) -> Iterable[Resources]:
+    def mocked_resources(
+        resource_data, video: bool = True, image: bool = True
+    ) -> Iterable[Resources]:
         if video:
             yield from videos
         if image:
             yield from images
 
-    mocker.patch('instapi.Resource.create_resources', side_effect=mocked_resources)
+    mocker.patch("instapi.Resource.create_resources", side_effect=mocked_resources)
 
 
 @fixture()
@@ -50,14 +36,16 @@ def mock_feeds(mocker, feeds) -> List[Feed]:
     Fixture that mocks user feeds
     """
     return mocker.patch(
-        'instapi.client.client.user_feed',
-        return_value={'items': as_dicts(feeds)},
+        "instapi.client.client.user_feed",
+        return_value={"items": as_dicts(feeds)},
     )
 
 
 def test_user_get(user, mocker):
     """Test for User.get classmethod"""
-    user_info_mock = mocker.patch('instapi.client.client.user_info', return_value={'user': user.as_dict()})
+    user_info_mock = mocker.patch(
+        "instapi.client.client.user_info", return_value={"user": user.as_dict()}
+    )
 
     assert User.get(user.pk) == user
 
@@ -66,7 +54,9 @@ def test_user_get(user, mocker):
 
 def test_user_from_username(user, mocker):
     """Test for User.from_username classmethod"""
-    username_info_mock = mocker.patch('instapi.client.client.username_info', return_value={'user': user.as_dict()})
+    username_info_mock = mocker.patch(
+        "instapi.client.client.username_info", return_value={"user": user.as_dict()}
+    )
 
     assert User.from_username(user.username) == user
 
@@ -76,7 +66,10 @@ def test_user_from_username(user, mocker):
 def test_user_match_username(user, mocker):
     """Test for User.match_username classmethod"""
     list_of_users = create_users(length=50)
-    search_mock = mocker.patch('instapi.client.client.search_users', return_value={'users': as_dicts(list_of_users)})
+    search_mock = mocker.patch(
+        "instapi.client.client.search_users",
+        return_value={"users": as_dicts(list_of_users)},
+    )
 
     assert User.match_username(user.username) == list_of_users
 
@@ -84,7 +77,7 @@ def test_user_match_username(user, mocker):
     search_mock.reset_mock()
 
     limit = 10
-    search_mock.return_value = {'users': as_dicts(list_of_users[:limit])}
+    search_mock.return_value = {"users": as_dicts(list_of_users[:limit])}
 
     assert User.match_username(user.username, limit=limit) == list_of_users[:limit]
 
@@ -93,8 +86,12 @@ def test_user_match_username(user, mocker):
 
 def test_user_self(user, mocker):
     """Test for User.self classmethod"""
-    user_info_mock = mocker.patch('instapi.client.client.user_info', return_value={'user': user.as_dict()})
-    current_user_mock = mocker.patch('instapi.client.client.current_user', return_value={'user': user.as_dict()})
+    user_info_mock = mocker.patch(
+        "instapi.client.client.user_info", return_value={"user": user.as_dict()}
+    )
+    current_user_mock = mocker.patch(
+        "instapi.client.client.current_user", return_value={"user": user.as_dict()}
+    )
 
     assert User.self() == user
 
@@ -113,33 +110,32 @@ def test_user_details(user, mocker):
     User.full_info method
     """
     user_details = {
-        'biography': random_string(),
-        'media_count': random_int(),
-        'follower_count': random_int(),
-        'following_count': random_int(),
+        "biography": random_string(),
+        "media_count": random_int(),
+        "follower_count": random_int(),
+        "following_count": random_int(),
         **user.as_dict(),
     }
-    full_info = {'user_detail': {'user': user_details}}
+    full_info = {"user_detail": {"user": user_details}}
 
-    details_mock = mocker.patch('instapi.client.client.user_detail_info', return_value=full_info)
+    details_mock = mocker.patch("instapi.client.client.user_detail_info", return_value=full_info)
 
-    assert user.biography == user_details['biography']
-    assert user.media_count == user_details['media_count']
-    assert user.follower_count == user_details['follower_count']
-    assert user.following_count == user_details['following_count']
+    assert user.biography == user_details["biography"]
+    assert user.media_count == user_details["media_count"]
+    assert user.follower_count == user_details["follower_count"]
+    assert user.following_count == user_details["following_count"]
     assert user.user_detail() == user_details
     assert user.full_info() == full_info
 
-    details_mock.assert_called_with(user.pk)
-    assert details_mock.call_count == 6
+    details_mock.assert_called_once_with(user.pk)
 
 
 def test_follow(user, mocker):
     """Test for User.follow method"""
-    self, = create_users(length=1)
+    (self,) = create_users(length=1)
 
-    friendships_mock = mocker.patch('instapi.client.client.friendships_create')
-    mocker.patch('instapi.models.User.self', return_value=self)
+    friendships_mock = mocker.patch("instapi.client.client.friendships_create")
+    mocker.patch("instapi.models.User.self", return_value=self)
 
     with raises(ValueError):
         user.follow(self)
@@ -153,10 +149,10 @@ def test_follow(user, mocker):
 
 def test_unfollow(user, mocker):
     """Test for User.unfollow method"""
-    self, = create_users(length=1)
+    (self,) = create_users(length=1)
 
-    friendships_mock = mocker.patch('instapi.client.client.friendships_destroy')
-    mocker.patch('instapi.models.User.self', return_value=self)
+    friendships_mock = mocker.patch("instapi.client.client.friendships_destroy")
+    mocker.patch("instapi.models.User.self", return_value=self)
 
     with raises(ValueError):
         user.unfollow(self)
@@ -220,7 +216,9 @@ def test_followers(mocker, user, users):
     User.iter_followers method
     User.followers method
     """
-    follow_mock = mocker.patch('instapi.client.client.user_followers', return_value={'users': as_dicts(users)})
+    follow_mock = mocker.patch(
+        "instapi.client.client.user_followers", return_value={"users": as_dicts(users)}
+    )
 
     assert [*user.iter_followers()] == users
     follow_mock.assert_called_once()
@@ -244,7 +242,9 @@ def test_followings(mocker, user, users):
     User.iter_followings method
     User.followings method
     """
-    follow_mock = mocker.patch('instapi.client.client.user_following', return_value={'users': as_dicts(users)})
+    follow_mock = mocker.patch(
+        "instapi.client.client.user_following", return_value={"users": as_dicts(users)}
+    )
 
     assert [*user.iter_followings()] == users
     follow_mock.assert_called_once()
@@ -295,7 +295,7 @@ def test_likes(mocker, mock_feeds, user, users, feeds):
     User.likes_chain
     User.likes_statistic
     """
-    mocker.patch('instapi.models.Feed.iter_likes', return_value=users)
+    mocker.patch("instapi.models.Feed.iter_likes", return_value=users)
     expected = flat([users] * len(feeds))
 
     assert [*user.likes_chain()] == expected
@@ -308,7 +308,7 @@ def test_liked_by(mocker, mock_feeds, feeds, user, users):
     User.iter_liked_by_user
     User.liked_by_user
     """
-    liked_by_mock = mocker.patch('instapi.models.Feed.liked_by')
+    liked_by_mock = mocker.patch("instapi.models.Feed.liked_by")
 
     def assert_method(like_user: User, expected: List[Feed]):
         liked_by_mock.reset_mock()
@@ -349,9 +349,9 @@ def test_stories(user, mocker, stories):
     User.stories
     """
 
-    return_value = {'reel': {'items': as_dicts(stories)}}
+    return_value = {"reel": {"items": as_dicts(stories)}}
 
-    story_mock = mocker.patch('instapi.client.client.user_story_feed', return_value=return_value)
+    story_mock = mocker.patch("instapi.client.client.user_story_feed", return_value=return_value)
 
     assert [*user.iter_stories()] == stories
     story_mock.assert_called_once_with(user.pk)

@@ -1,20 +1,9 @@
-from typing import (
-    Generator,
-    List,
-)
+from typing import Generator, List
 
-from pytest import (
-    fixture,
-    mark,
-    raises)
+from pytest import fixture, mark, raises
 
-from instapi.utils import (
-    flat,
-    limited,
-    process_many,
-    to_list,
-    join,
-)
+from instapi.utils import flat, join, limited, process_many, to_list
+
 from .conftest import random_int
 
 
@@ -34,7 +23,7 @@ class TestFlat:
 
 
 @mark.parametrize(
-    'func,ret_type',
+    "func,ret_type",
     [
         [limited, Generator],
         [to_list, List],
@@ -55,20 +44,20 @@ class TestLimitedAndToList:
         assert isinstance(func(arr), ret_type)
         assert isinstance(func(arr, limit=10), ret_type)
 
-    @mark.usefixtures('ret_type')
+    @mark.usefixtures("ret_type")
     def test_without_limit(self, arr, func):
         assert [*func(arr)] == arr
 
-    @mark.usefixtures('ret_type')
+    @mark.usefixtures("ret_type")
     def test_limit_bigger(self, arr, func):
         assert [*func(arr, limit=len(arr) * 5)] == arr
 
-    @mark.usefixtures('ret_type')
+    @mark.usefixtures("ret_type")
     def test_limit_less(self, arr, func):
         limit = len(arr) // 2
         assert [*func(arr, limit=limit)] == arr[:limit]
 
-    @mark.usefixtures('ret_type')
+    @mark.usefixtures("ret_type")
     def test_limit_negative(self, arr, func):
         with raises(ValueError):
             _ = [*func(arr, limit=-10)]
@@ -98,34 +87,35 @@ class TestProcessMany:
         mock.assert_called_once()
 
         _, kwargs = mock.call_args
-        assert 'rank_token' in kwargs
-        assert isinstance(kwargs['rank_token'], str)
+        assert "rank_token" in kwargs
+        assert isinstance(kwargs["rank_token"], str)
 
     def test_process_many_called_multiple_times(self, mocker):
-        max_ids = [*[{'next_max_id': random_int()} for _ in range(3)], {}]
+        max_ids = [*[{"next_max_id": random_int()} for _ in range(3)], {}]
         mock = mocker.Mock(side_effect=max_ids)
 
         _ = [*process_many(mock)]
 
-        mock.assert_has_calls([
-            mocker.call(),
-            *[mocker.call(max_id=m['next_max_id']) for m in max_ids[:-1]]
-        ])
+        mock.assert_has_calls(
+            [
+                mocker.call(),
+                *[mocker.call(max_id=m["next_max_id"]) for m in max_ids[:-1]],
+            ]
+        )
 
     def test_process_many_return_value(self, mocker):
-        max_ids = [*[{'next_max_id': random_int()} for _ in range(3)], {}]
+        max_ids = [*[{"next_max_id": random_int()} for _ in range(3)], {}]
         mock = mocker.Mock(side_effect=max_ids)
 
         assert [*process_many(mock)] == max_ids
 
 
 class TestJoin:
-
     def test_join_not_str(self):
-        assert join(range(4)) == '0,1,2,3'
+        assert join(range(4)) == "0,1,2,3"
 
     def test_join_str(self):
-        assert join(['hello', 'world'], 'hello,world')
+        assert join(["hello", "world"], "hello,world")
 
     def test_custom_separator(self):
-        assert join(['hello', 'world'], ' ') == 'hello world'
+        assert join(["hello", "world"], " ") == "hello world"

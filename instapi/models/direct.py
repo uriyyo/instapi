@@ -1,22 +1,13 @@
-from typing import Any
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
+from dataclasses import dataclass, field
+from typing import Any, Iterable, List, Optional, Tuple, Type
 
-from dataclasses import dataclass
-from dataclasses import field
-
-from instapi.client import client
-from instapi.models.base import BaseModel
-from instapi.models.base import ModelT_co
-from instapi.models.media import Media
-from instapi.models.user import User
-from instapi.types import StrDict
-from instapi.utils import process_many
-from instapi.utils import to_list
+from ..cache import cached
+from ..client import client
+from ..types import StrDict
+from ..utils import process_many, to_list
+from .base import BaseModel, ModelT_co
+from .media import Media
+from .user import User
 
 
 @dataclass(frozen=True)
@@ -29,22 +20,13 @@ class Message(BaseModel):
     story_share: StrDict = field(default_factory=dict)
 
     @classmethod
-    def create(cls: Type[ModelT_co], data: StrDict, cache: Dict[int, User] = None) -> ModelT_co:
-        user_id = data.pop('user_id')
-
-        if cache is not None and user_id in cache:
-            user = cache[user_id]
-        else:
-            user = User.get(user_id)
-
-            if cache is not None:
-                cache[user_id] = user
-
-        return super().create({'user': user, **data})
+    def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:
+        user_id = data.pop("user_id")
+        return super().create({"user": User.get(user_id), **data})  # type: ignore
 
     def as_dict(self) -> StrDict:
         data = super().as_dict()
-        data['user_id'] = data.pop('user')['pk']
+        data["user_id"] = data.pop("user")["pk"]
 
         return data
 
@@ -59,48 +41,51 @@ class Direct(BaseModel):
 
     @classmethod
     def create(cls: Type[ModelT_co], data: Any) -> ModelT_co:
-        return super().create({
-            **data,
-            'users': tuple(map(User.create, data['users'])),
-        })
+        return super().create(  # type: ignore
+            {
+                **data,
+                "users": tuple(map(User.create, data["users"])),
+            }
+        )
 
     @classmethod
-    def iter_directs(cls) -> Iterable['Direct']:
-        for response in process_many(client.direct_v2_inbox, key='cursor', key_path='inbox.oldest_cursor'):
-            yield from map(Direct.create, response['inbox']['threads'])
+    def iter_directs(cls) -> Iterable["Direct"]:
+        for response in process_many(
+            client.direct_v2_inbox, key="cursor", key_path="inbox.oldest_cursor"
+        ):
+            yield from map(Direct.create, response["inbox"]["threads"])
 
     @classmethod
-    def directs(cls, limit: Optional[int] = None) -> List['Direct']:
+    def directs(cls, limit: Optional[int] = None) -> List["Direct"]:
         return to_list(cls.iter_directs(), limit)
 
     @classmethod
+    @cached
     def with_user(cls: Type[ModelT_co], user: User) -> ModelT_co:
         result = client.direct_v2_get_by_participants(user)
 
         try:
-            return cls.create(result['thread'])
+            return cls.create(result["thread"])
         except KeyError:
-            return cls(user.username, 'private', False, (user,))  # type: ignore
+            return cls(user.username, "private", False, (user,))  # type: ignore
 
-    def iter_message(self) -> Iterable['Message']:
-        cache: Dict[int, User] = {}
-
+    def iter_message(self) -> Iterable["Message"]:
         for response in process_many(
-                client.direct_v2_thread,
-                self.thread_id,
-                key='cursor',
-                key_path='thread.oldest_cursor',
+            client.direct_v2_thread,
+            self.thread_id,
+            key="cursor",
+            key_path="thread.oldest_cursor",
         ):
-            yield from (Message.create(item, cache) for item in response['thread']['items'])
+            yield from map(Message.create, response["thread"]["items"])
 
-    def messages(self, limit: Optional[int] = None) -> List['Message']:
+    def messages(self, limit: Optional[int] = None) -> List["Message"]:
         return to_list(self.iter_message(), limit)
 
     @property
     def _send_args(self) -> StrDict:
         return {
-            'recipient_users': self.users,
-            'thread_id': self.thread_id,
+            "recipient_users": self.users,
+            "thread_id": self.thread_id,
         }
 
     def send_text(self, text: str) -> None:
@@ -109,28 +94,28 @@ class Direct(BaseModel):
             **self._send_args,
         )
 
-    def send_link(self, link: str, text: str = '') -> None:
+    def send_link(self, link: str, text: str = "") -> None:
         client.direct_v2_send_link(
             link=link,
             text=text,
             **self._send_args,
         )
 
-    def send_profile(self, user: User, text: str = '') -> None:
+    def send_profile(self, user: User, text: str = "") -> None:
         client.direct_v2_send_profile(
             text=text,
             profile_id=user.pk,
             **self._send_args,
         )
 
-    def send_hashtag(self, hashtag: str, text: str = '') -> None:
+    def send_hashtag(self, hashtag: str, text: str = "") -> None:
         client.direct_v2_send_hashtag(
             hashtag=hashtag,
             text=text,
             **self._send_args,
         )
 
-    def send_media(self, media: Media, text: str = '') -> None:
+    def send_media(self, media: Media, text: str = "") -> None:
         client.direct_v2_send_media_share(
             text=text,
             media_id=media.pk,
@@ -139,6 +124,6 @@ class Direct(BaseModel):
 
 
 __all__ = [
-    'Direct',
-    'Message',
+    "Direct",
+    "Message",
 ]

@@ -3,5 +3,5 @@ class ClientNotInitedException(Exception):
 
 
 __all__ = [
-    'ClientNotInitedException',
+    "ClientNotInitedException",
 ]

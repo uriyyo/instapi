@@ -6,15 +6,15 @@ class TestMedia:
 
     def test_media_info(self, media, mocker):
         items = [[*range(100)]]
-        data = {'items': items}
+        data = {"items": items}
 
-        media_info_mock = mocker.patch('instapi.client.client.media_info', return_value=data)
+        media_info_mock = mocker.patch("instapi.client.client.media_info", return_value=data)
 
         assert media._media_info() == items[0]
         media_info_mock.assert_called_once_with(media.pk)
 
     def test_comment(self, mocker, media):
-        comment_mock = mocker.patch('instapi.client.client.post_comment')
+        comment_mock = mocker.patch("instapi.client.client.post_comment")
         text = random_string()
 
         media.comment(text)

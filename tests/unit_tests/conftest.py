@@ -1,26 +1,15 @@
-from functools import partial
-from random import (
-    choice,
-    randint,
-)
-from string import ascii_letters
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Type,
-    TypeVar,
-    Union,
-)
-
 from dataclasses import is_dataclass
+from functools import partial
+from random import choice, randint
+from string import ascii_letters
+from typing import Any, Callable, Dict, List, Type, TypeVar, Union
+
 from pytest import fixture
 
 from instapi import models
 from instapi.client import ClientProxy
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def pytest_configure():
@@ -35,7 +24,7 @@ def random_bytes(count: int = 10) -> bytes:
     :param count: how many bytes will be generated
     :return: random bytes
     """
-    return b''.join(bytes(choice(ascii_letters), 'ascii') for _ in range(count))
+    return b"".join(bytes(choice(ascii_letters), "ascii") for _ in range(count))
 
 
 def random_string(length: int = 10, source: str = ascii_letters) -> str:
@@ -46,7 +35,7 @@ def random_string(length: int = 10, source: str = ascii_letters) -> str:
     :param source: source of characters to use
     :return: random string
     """
-    return ''.join(choice(source) for _ in range(length))
+    return "".join(choice(source) for _ in range(length))
 
 
 def random_int(start: int = 1, end: int = 100) -> int:
@@ -60,14 +49,14 @@ def random_int(start: int = 1, end: int = 100) -> int:
     return randint(start, end)
 
 
-def random_url(extension: str = '.jpg'):
+def random_url(extension: str = ".jpg"):
     """
     Generate random url
 
     :param extension: extension to add to url
     :return: random url
     """
-    return f'http://{random_string()}.com/{random_string()}{extension}'
+    return f"http://{random_string()}.com/{random_string()}{extension}"
 
 
 # Define default actions to do for different types
@@ -109,10 +98,12 @@ def rand(cls: Type[T], **kwargs) -> T:
 
     fields_info = {f: cls.__dataclass_fields__[f] for f in cls.fields() if f not in kwargs}
 
-    return cls(**{
-        **{name: _get_rand_type(field.type) for name, field in fields_info.items()},
-        **kwargs,
-    })
+    return cls(
+        **{
+            **{name: _get_rand_type(field.type) for name, field in fields_info.items()},
+            **kwargs,
+        }
+    )
 
 
 def rands(cls: Type[T], length: int = 10, **kwargs: Callable[[], Any]) -> List[T]:

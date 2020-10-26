@@ -15,9 +15,9 @@ InstAPI - comfortable and easy to use Python's library for interaction with Inst
 
 Installation
 ------------
-1. Download InstAPI from this repository.
-2. Run `pip install -e [PATH to directory with InstAPI]` in console.
-3. Done!
+```bash
+pip install inst-api
+```
 
 Usage
 -----
@@ -35,18 +35,6 @@ instagram_profile = User.from_username('username')
 for feed in instagram_profile.iter_feeds():
   feed.like()
 ```
-
-Install requires
-----------------
-* dataclasses (version 0.6.0)
-* instagram-private-api (version 1.6.0.0)
-* Pillow (version 6.1.0)
-* requests (version 2.22.0)
-
-Release History
----------------
-* 0.0.1
-  * Work in progress
 
 Contribute
 ----------
