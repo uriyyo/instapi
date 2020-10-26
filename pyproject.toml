@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "instapi"
+name = "inst-api"
 version = "0.2.0"
 description = "InstAPI - comfortable and easy to use Python's library for interaction with Instagram"
 authors = ["Yurii Karabas <1998uriyyo@gmail.com>"]
