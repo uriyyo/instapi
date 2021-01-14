@@ -5,7 +5,6 @@ from typing import IO, Iterable, List, Optional, Tuple, Type, Union, cast
 from urllib.parse import urlparse
 
 import requests
-from PIL import Image as PILImage
 
 from ..types import StrDict
 from ..utils import to_list
@@ -194,6 +193,11 @@ class Image(Resource):
         :param candidate: candidate to preview or None
         :return: None
         """
+        try:
+            from PIL import Image as PILImage
+        except ImportError:
+            raise RuntimeError("Inst-API is installed without pillow\npip install inst-api[pillow]")
+
         candidate = candidate or self.best_candidate
 
         img = PILImage.open(candidate.content())
