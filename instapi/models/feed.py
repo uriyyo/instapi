@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, cast
 
 from ..cache import cached
 from ..client import client
@@ -22,6 +22,10 @@ class Feed(ResourceContainer):
 
     like_count: int
     comment_count: int = 0
+
+    @property
+    def caption(self) -> str:
+        return cast(str, self._media_info()["caption"]["text"])
 
     @classmethod
     def iter_timeline(cls) -> Iterable["Feed"]:

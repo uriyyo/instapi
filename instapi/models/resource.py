@@ -195,7 +195,7 @@ class Image(Resource):
         """
         try:
             from PIL import Image as PILImage
-        except ImportError:
+        except ImportError:  # pragma: no cover
             raise RuntimeError("Inst-API is installed without pillow\npip install inst-api[pillow]")
 
         candidate = candidate or self.best_candidate

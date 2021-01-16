@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from ..conftest import random_int
+from ..conftest import random_int, random_string
 from .conftest import as_dicts
 
 
@@ -109,3 +109,11 @@ class TestFeed:
         feeds = feed.timeline(limit=limit)
 
         assert feeds == feeds[:limit]
+
+    def test_caption(self, mocker, feed):
+        caption = random_string()
+        mocker.patch(
+            "instapi.models.feed.Feed._media_info", return_value={"caption": {"text": caption}}
+        )
+
+        assert feed.caption == caption
