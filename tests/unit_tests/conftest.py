@@ -75,7 +75,7 @@ def _get_rand_type(field_type: Union[str, Type[T]]) -> T:
     :return: random field value
     """
     if isinstance(field_type, str):
-        field_type = getattr(models, field_type)
+        field_type = eval(field_type, vars(models))
 
     if field_type in TYPE_TO_ACTION:
         return TYPE_TO_ACTION[field_type]()
