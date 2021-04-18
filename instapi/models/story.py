@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Type
 
 from ..client import client
@@ -16,7 +16,7 @@ class Story(ResourceContainer):
 
     # TODO: Add ability to send reactions on the story
 
-    mentions: List["User"]
+    mentions: List["User"] = field(hash=False)
 
     @classmethod
     def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:
