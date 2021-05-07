@@ -59,7 +59,7 @@ def to_list(iterable: Iterable[T], limit: Optional[int] = None) -> List[T]:
     return [*limited(iterable, limit=limit)]
 
 
-def flat(source: List[Iterable[T]]) -> List[T]:
+def flat(source: Iterable[Iterable[T]]) -> List[T]:
     """
     Unpack list of iterable into single list
 

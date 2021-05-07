@@ -15,8 +15,8 @@ class TestFeed:
     @fixture
     def mock_comments(self, mocker, comments):
         return mocker.patch(
-            "instapi.client.client.media_comments",
-            return_value={"comments": as_dicts(comments)},
+            "instapi.client.client.media_comments_gen",
+            return_value=as_dicts(comments),
         )
 
     @fixture
