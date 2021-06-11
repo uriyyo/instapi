@@ -5,13 +5,13 @@ from ..cache import cached
 from ..client import client
 from ..types import StrDict
 from ..utils import process_many, to_list
-from .comment import Comment
+from .comment import CommentsBoundMixin
 from .resource import ResourceContainer
 from .user import User
 
 
 @dataclass(frozen=True)
-class Feed(ResourceContainer):
+class Feed(CommentsBoundMixin, ResourceContainer):
     """
     This class represent Instagram's feed. It gives opportunity to:
     -   Get posts from feed
@@ -119,27 +119,6 @@ class Feed(ResourceContainer):
         :return: none
         """
         client.delete_like(self.pk)
-
-    def iter_comments(self) -> Iterable["Comment"]:
-        """
-        Create generator for iteration over comments, which was attached to the post
-
-        :return: generator with comments
-        """
-        for result in process_many(client.media_comments, self.pk):
-            for c in result["comments"]:
-                c["user"] = User.create(c["user"])
-
-            yield from map(Comment.create, result["comments"])
-
-    def comments(self, limit: Optional[int] = None) -> List["Comment"]:
-        """
-        Generate list of comments, which was attached to the post
-
-        :param limit: number of comments, which will be added to the list
-        :return: list with comments
-        """
-        return to_list(self.iter_comments(), limit=limit)
 
 
 __all__ = [
