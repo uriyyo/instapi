@@ -1,4 +1,4 @@
-from typing import Any, Dict, cast
+from typing import Optional, cast
 
 from instagram_private_api import Client
 
@@ -9,8 +9,8 @@ class BaseClient(Client):
     def _call_api(
         self,
         endpoint: str,
-        params: Dict[str, Any] = None,
-        query: Dict[str, Any] = None,
+        params: Optional[StrDict] = None,
+        query: Optional[StrDict] = None,
         return_response: bool = False,
         unsigned: bool = False,
         version: str = "v1",

@@ -1,4 +1,6 @@
-from dataclasses import dataclass, field
+from __future__ import annotations
+
+from dataclasses import field
 from typing import Any, Iterable, List, Optional, Tuple, Type
 
 from ..cache import cached
@@ -10,7 +12,6 @@ from .media import Media
 from .user import User
 
 
-@dataclass(frozen=True)
 class Message(BaseModel):
     item_id: int
     timestamp: int
@@ -31,7 +32,6 @@ class Message(BaseModel):
         return data
 
 
-@dataclass(frozen=True)
 class Direct(BaseModel):
     thread_title: str
     thread_type: str
@@ -49,14 +49,14 @@ class Direct(BaseModel):
         )
 
     @classmethod
-    def iter_directs(cls) -> Iterable["Direct"]:
+    def iter_directs(cls) -> Iterable[Direct]:
         for response in process_many(
             client.direct_v2_inbox, key="cursor", key_path="inbox.oldest_cursor"
         ):
             yield from map(Direct.create, response["inbox"]["threads"])
 
     @classmethod
-    def directs(cls, limit: Optional[int] = None) -> List["Direct"]:
+    def directs(cls, limit: Optional[int] = None) -> List[Direct]:
         return to_list(cls.iter_directs(), limit)
 
     @classmethod
@@ -69,7 +69,7 @@ class Direct(BaseModel):
         except KeyError:
             return cls(user.username, "private", False, (user,))  # type: ignore
 
-    def iter_message(self) -> Iterable["Message"]:
+    def iter_message(self) -> Iterable[Message]:
         for response in process_many(
             client.direct_v2_thread,
             self.thread_id,
@@ -78,7 +78,7 @@ class Direct(BaseModel):
         ):
             yield from map(Message.create, response["thread"]["items"])
 
-    def messages(self, limit: Optional[int] = None) -> List["Message"]:
+    def messages(self, limit: Optional[int] = None) -> List[Message]:
         return to_list(self.iter_message(), limit)
 
     @property

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass, field, fields
 from typing import AbstractSet, Any, Type, TypeVar, cast
 
@@ -6,8 +8,19 @@ from ..types import StrDict
 ModelT_co = TypeVar("ModelT_co", bound="BaseModel", covariant=True)
 
 
-@dataclass(frozen=True)
-class BaseModel:
+class BaseModelMeta(type):
+    def __new__(mcs, *args: Any, **kwargs: Any) -> Any:
+        cls = super().__new__(mcs, *args, **kwargs)
+
+        try:
+            dataclass_kwargs = cls.Config.dataclass_kwargs  # noqa
+        except AttributeError:
+            dataclass_kwargs = {}
+
+        return dataclass(**{"frozen": True, **dataclass_kwargs})(cls)
+
+
+class BaseModel(metaclass=BaseModelMeta):
     @classmethod
     def fields(cls) -> AbstractSet[str]:
         return {f.name for f in fields(cls)} - {"__dataclass_fields__"}
@@ -31,7 +44,6 @@ class BaseModel:
         }
 
 
-@dataclass(frozen=True)
 class Entity(BaseModel):
     pk: int = field(repr=False)
 

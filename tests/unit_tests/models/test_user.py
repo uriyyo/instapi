@@ -11,7 +11,7 @@ from ..conftest import random_int, random_string
 from .conftest import as_dicts, create_users
 
 
-@fixture()
+@fixture
 def mock_feeds_with_resources(mocker, feeds, images, videos):
     """
     Fixture that mocks user feeds and feeds resources
@@ -30,7 +30,7 @@ def mock_feeds_with_resources(mocker, feeds, images, videos):
     mocker.patch("instapi.Resource.create_resources", side_effect=mocked_resources)
 
 
-@fixture()
+@fixture
 def mock_feeds(mocker, feeds) -> List[Feed]:
     """
     Fixture that mocks user feeds

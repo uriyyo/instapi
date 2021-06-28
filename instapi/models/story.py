@@ -1,4 +1,6 @@
-from dataclasses import dataclass, field
+from __future__ import annotations
+
+from dataclasses import field
 from typing import List, Type
 
 from ..client import client
@@ -8,7 +10,6 @@ from .resource import ResourceContainer
 from .user import User
 
 
-@dataclass(frozen=True)
 class Story(ResourceContainer):
     """
     Class that represent user story
@@ -16,7 +17,7 @@ class Story(ResourceContainer):
 
     # TODO: Add ability to send reactions on the story
 
-    mentions: List["User"] = field(hash=False)
+    mentions: List[User] = field(hash=False)
 
     @classmethod
     def create(cls: Type[ModelT_co], data: StrDict) -> ModelT_co:

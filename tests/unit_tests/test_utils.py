@@ -36,7 +36,7 @@ class TestLimitedAndToList:
     to_list function
     """
 
-    @fixture()
+    @fixture
     def arr(self):
         return [*range(100)]
 

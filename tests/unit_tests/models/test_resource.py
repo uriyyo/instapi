@@ -109,7 +109,7 @@ class TestResource:
 
     def test_resource_with_no_candidates(self):
         with raises(ValueError):
-            Resource(())
+            Resource(candidates=())
 
 
 class TestResourceContainer:

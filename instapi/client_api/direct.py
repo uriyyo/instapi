@@ -1,4 +1,4 @@
-from typing import Iterable, Union, cast
+from typing import Iterable, Optional, Union, cast
 
 import requests
 from instagram_private_api.errors import ClientError
@@ -77,7 +77,7 @@ class DirectEndpoint(BaseClient):
     def direct_v2_send_link(
         self,
         recipient_users: RecipientUsers = (),
-        thread_id: int = None,
+        thread_id: Optional[int] = None,
         *,
         text: str = "",
         link: str,
@@ -95,7 +95,7 @@ class DirectEndpoint(BaseClient):
     def direct_v2_send_media_share(
         self,
         recipient_users: RecipientUsers = (),
-        thread_id: int = None,
+        thread_id: Optional[int] = None,
         *,
         text: str = "",
         media_type: str = "photo",
@@ -115,7 +115,7 @@ class DirectEndpoint(BaseClient):
     def direct_v2_send_hashtag(
         self,
         recipient_users: RecipientUsers = (),
-        thread_id: int = None,
+        thread_id: Optional[int] = None,
         *,
         text: str = "",
         hashtag: str,
@@ -133,7 +133,7 @@ class DirectEndpoint(BaseClient):
     def direct_v2_send_profile(
         self,
         recipient_users: RecipientUsers = (),
-        thread_id: int = None,
+        thread_id: Optional[int] = None,
         *,
         text: str = "",
         profile_id: int,

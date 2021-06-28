@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
 from typing import Iterable, List, Optional, cast
 
 from ..cache import cached
@@ -10,7 +11,6 @@ from .resource import ResourceContainer
 from .user import User
 
 
-@dataclass(frozen=True)
 class Feed(ResourceContainer):
     """
     This class represent Instagram's feed. It gives opportunity to:
@@ -28,7 +28,7 @@ class Feed(ResourceContainer):
         return cast(str, self._media_info()["caption"]["text"])
 
     @classmethod
-    def iter_timeline(cls) -> Iterable["Feed"]:
+    def iter_timeline(cls) -> Iterable[Feed]:
         """
         Create generator for iteration over posts from feed
 
@@ -42,7 +42,7 @@ class Feed(ResourceContainer):
             )
 
     @classmethod
-    def timeline(cls, limit: Optional[int] = None) -> List["Feed"]:
+    def timeline(cls, limit: Optional[int] = None) -> List[Feed]:
         """
         Generate list of posts from feed
 
@@ -51,7 +51,7 @@ class Feed(ResourceContainer):
         """
         return to_list(cls.iter_timeline(), limit=limit)
 
-    def _resources(self) -> Iterable["StrDict"]:
+    def _resources(self) -> Iterable[StrDict]:
         """
         Feed can contain multiple images and videos that located in carousel_media
 
@@ -61,7 +61,7 @@ class Feed(ResourceContainer):
         return media_info.get("carousel_media", [media_info])
 
     @cached
-    def user_tags(self) -> List["User"]:
+    def user_tags(self) -> List[User]:
         """
         Generate list of Users from Feed usertags
 
@@ -74,7 +74,7 @@ class Feed(ResourceContainer):
 
         return [User.create(u["user"]) for u in info["usertags"]["in"]]
 
-    def iter_likes(self) -> Iterable["User"]:
+    def iter_likes(self) -> Iterable[User]:
         """
         Create generator for iteration over posts from feed
 
@@ -83,7 +83,7 @@ class Feed(ResourceContainer):
         for result in process_many(client.media_likers, self.pk):
             yield from map(User.create, result["users"])
 
-    def likes(self, limit: Optional[int] = None) -> List["User"]:
+    def likes(self, limit: Optional[int] = None) -> List[User]:
         """
         Generate list of users, which has liked a post
 
@@ -92,7 +92,7 @@ class Feed(ResourceContainer):
         """
         return to_list(self.iter_likes(), limit=limit)
 
-    def liked_by(self, user: "User") -> bool:
+    def liked_by(self, user: User) -> bool:
         """
         Check if post was liked by user
 
@@ -120,7 +120,7 @@ class Feed(ResourceContainer):
         """
         client.delete_like(self.pk)
 
-    def iter_comments(self) -> Iterable["Comment"]:
+    def iter_comments(self) -> Iterable[Comment]:
         """
         Create generator for iteration over comments, which was attached to the post
 
@@ -132,7 +132,7 @@ class Feed(ResourceContainer):
 
             yield from map(Comment.create, result["comments"])
 
-    def comments(self, limit: Optional[int] = None) -> List["Comment"]:
+    def comments(self, limit: Optional[int] = None) -> List[Comment]:
         """
         Generate list of comments, which was attached to the post
 

@@ -118,7 +118,7 @@ def rands(cls: Type[T], length: int = 10, **kwargs: Callable[[], Any]) -> List[T
     return [rand(cls, **{k: v() for k, v in kwargs.items()}) for _ in range(length)]
 
 
-@fixture()
+@fixture
 def regular_client_mode():
     """
     Fixture that disable ClientProxy testing mode for single test

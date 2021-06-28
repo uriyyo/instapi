@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from pytest import fixture, raises
 
 from instapi.models.base import BaseModel
@@ -9,9 +7,8 @@ from tests.unit_tests.conftest import random_int, random_string
 class TestBaseModel:
     """Tests for BaseModel class"""
 
-    @fixture()
+    @fixture
     def model_cls(self):
-        @dataclass(frozen=True)
         class TempModel(BaseModel):
             a: int
             b: int
@@ -19,7 +16,7 @@ class TestBaseModel:
 
         return TempModel
 
-    @fixture()
+    @fixture
     def mocked_fields(self, mocker):
         fields = {"a", "b", "c"}
         mocker.patch("instapi.models.base.BaseModel.fields", return_value=fields)
@@ -35,19 +32,16 @@ class TestBaseModel:
     def test_fields_with_inheritance(self):
         """Test for BaseModel.fields classmethod"""
 
-        @dataclass(frozen=True)
         class First(BaseModel):
             a: int
 
         assert First.fields() == {"a"}
 
-        @dataclass(frozen=True)
         class Two(First):
             b: int
 
         assert Two.fields() == {"a", "b"}
 
-        @dataclass(frozen=True)
         class Three(Two):
             c: int
 

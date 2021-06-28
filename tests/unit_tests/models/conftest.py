@@ -138,7 +138,7 @@ def create_stories(length: int = 10) -> List[Story]:
     return rands(Story, length=length, mentions=list)
 
 
-@fixture()
+@fixture
 def user() -> User:
     """Fixture that return dummy user"""
     # User id must not be in range from 1 to 100 because
@@ -148,58 +148,58 @@ def user() -> User:
     return rand(User, pk=random_int(101, 200))
 
 
-@fixture()
+@fixture
 def entity():
     """Fixture that return dummy entity"""
     return rand(Entity)
 
 
-@fixture()
+@fixture
 def media():
     """Fixture that return dummy media"""
     return rand(Media)
 
 
-@fixture()
+@fixture
 def image():
     """Fixture that return dummy image"""
     (im,) = create_images(length=1)
     return im
 
 
-@fixture()
+@fixture
 def resource():
     """Fixture that return dummy resource"""
     (resp,) = create_resource(length=1)
     return resp
 
 
-@fixture()
+@fixture
 def feed() -> Feed:
     """Fixture that return dummy feed"""
     (f,) = create_feeds(length=1)
     return f
 
 
-@fixture()
+@fixture
 def candidate() -> Candidate:
     """Fixture that return dummy candidate"""
     (c,) = create_candidates(length=1)
     return c
 
 
-@fixture()
+@fixture
 def comment(user) -> Comment:
     """Fixture that return comment with random content"""
     return rand(Comment)
 
 
-@fixture()
+@fixture
 def story() -> Story:
     return rand(Story, mentions=[])
 
 
-@fixture()
+@fixture
 def resource_container() -> ResourceContainer:
     return rand(ResourceContainer)
 
