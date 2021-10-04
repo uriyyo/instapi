@@ -32,7 +32,7 @@ pytest = "^6.2.5"
 black = "^21.9b0"
 pre-commit = "^2.15.0"
 pytest-mock = "^3.6.1"
-pytest-cov = "^2.12.1"
+pytest-cov = "^3.0.0"
 
 [tool.poetry.extras]
 pillow = [
