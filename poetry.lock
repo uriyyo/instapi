@@ -316,7 +316,7 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-mock"
-version = "3.9.0"
+version = "3.10.0"
 description = "Thin-wrapper around the mock package for easier use with pytest"
 category = "dev"
 optional = false
@@ -444,7 +444,7 @@ pillow = ["pillow"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "93a88fc2c4dbbd80f92bc0538258a25331b0fda55c4eaedf653de8d3954e5417"
+content-hash = "5dc7d925ba78b3f45eb0154ca2297e8a361e6d71032a6f86c9c4501beec843ee"
 
 [metadata.files]
 appdirs = [
@@ -685,8 +685,8 @@ pytest-cov = [
     {file = "pytest_cov-4.0.0-py3-none-any.whl", hash = "sha256:2feb1b751d66a8bd934e5edfa2e961d11309dc37b73b0eabe73b5945fee20f6b"},
 ]
 pytest-mock = [
-    {file = "pytest-mock-3.9.0.tar.gz", hash = "sha256:c899a0dcc8a5f22930acd020b500abd5f956911f326864a3b979e4866e14da82"},
-    {file = "pytest_mock-3.9.0-py3-none-any.whl", hash = "sha256:1a1b9264224d026932d6685a0f9cef3b61d91563c3e74af9fe5afb2767e13812"},
+    {file = "pytest-mock-3.10.0.tar.gz", hash = "sha256:fbbdb085ef7c252a326fd8cdcac0aa3b1333d8811f131bdcc701002e1be7ed4f"},
+    {file = "pytest_mock-3.10.0-py3-none-any.whl", hash = "sha256:f4c973eeae0282963eb293eb173ce91b091a79c1334455acfac9ddee8a1c784b"},
 ]
 pyyaml = [
     {file = "PyYAML-5.4.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:3b2b1824fe7112845700f815ff6a489360226a5609b96ec2190a45e62a9fc922"},
