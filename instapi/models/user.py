@@ -89,6 +89,18 @@ class User(Entity):
         return cast(int, self.user_detail()["media_count"])
 
     @property
+    def get_phone_number(self) -> str:
+        """
+        Return user's phone number
+
+        :return: str
+        """
+        detail = self.user_detail()
+        phone_number = detail["public_phone_country_code"] + detail["public_phone_number"]
+
+        return "+{}".format(phone_number) if phone_number else ""
+
+    @property
     def follower_count(self) -> int:
         """
         Return user's count of followers
